@@ -2,6 +2,7 @@
 # 🧩 Satifly - Developer Makefile
 # Simplifies common Docker & Symfony tasks
 # ===========================================
+.SILENT:
 
 # Default variables (can be overridden)
 APP_NAME       ?= satifly
@@ -93,7 +94,14 @@ env-check: ## Ensure .env file exists
 	fi
 
 doctor: ## Run project health checks
-	$(COMPOSE) exec $(PHP_CONTAINER) php bin/console about
+	$(COMPOSE) exec $(PHP_CONTAINER) sh -c '\
+		for dir in /app/var/composer /app/var/composer/cache; do \
+			if [ ! -d $$dir ]; then \
+				echo "📁 Creating missing directory $$dir..."; \
+				mkdir -p $$dir; \
+			fi; \
+		done && \
+		php bin/console about'
 
 # -------------------------------------------
 # 🪄 Xdebug Controls
