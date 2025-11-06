@@ -41,6 +41,7 @@ cd satifly
 ```
 make build
 make up
+make doctor
 ```
 
 4.  Open [https://localhost](https://localhost) and enjoy your private PHP registry.
