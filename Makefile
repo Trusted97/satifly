@@ -5,7 +5,7 @@
 
 # Default variables (can be overridden)
 APP_NAME       ?= satifly
-APP_PORT       ?= 8000
+APP_PORT       ?= 80
 COMPOSE        ?= docker compose
 PHP_CONTAINER  ?= php
 ENV_FILE       ?= .env
