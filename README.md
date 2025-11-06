@@ -67,6 +67,8 @@ make satis-init
 
 Prefer a visual experience? Configure everything directly via the web UI at `/admin/configuration`.
 
+> 📚 For more details on how Satis works (configuration examples, usage, and authentication), refer to the official Composer documentation: [Using Satis](https://composer.github.io/satis/using)
+
 ### 🔧 Application Settings
 
 Tune Satifly’s behavior in `app/config/parameters.yml`.
