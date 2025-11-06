@@ -1,0 +1,98 @@
+{
+    "name": "trusted97/satifly",
+    "license": "MIT",
+    "type": "project",
+    "keywords": ["satis", "composer", "backend", "ui", "packagist", "static-packagist"],
+    "description": "Satis composer repository manager with a Web UI",
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.4",
+        "ext-json": "*",
+        "ext-xml": "*",
+        "composer/composer": "^2.0",
+        "composer/satis": "dev-main",
+        "doctrine/annotations": "^1.6",
+        "doctrine/instantiator": "^1.1",
+        "incenteev/composer-parameter-handler": "^2.1",
+        "laminas/laminas-diactoros": "^3.6",
+        "ninsuo/symfony-collection": "^2.1",
+        "phpdocumentor/reflection-docblock": "^5.6",
+        "ramunasd/symfony-container-mocks": "^0.6.0",
+        "runtime/frankenphp-symfony": "^0.2.0",
+        "symfony/asset": "^7.3",
+        "symfony/console": "^7.3",
+        "symfony/dependency-injection": "^7.3",
+        "symfony/dotenv": "^7.3",
+        "symfony/event-dispatcher": "^7.3",
+        "symfony/flex": "^2.4",
+        "symfony/form": "^7.3",
+        "symfony/framework-bundle": "^7.3",
+        "symfony/lock": "^7.3",
+        "symfony/monolog-bundle": "^3.8",
+        "symfony/property-access": "^7.3",
+        "symfony/property-info": "^7.3",
+        "symfony/psr-http-message-bridge": "^7.3",
+        "symfony/runtime": "^7.3",
+        "symfony/security-bundle": "^7.3",
+        "symfony/serializer": "^7.3",
+        "symfony/string": "^7.3",
+        "symfony/twig-bundle": "^7.3",
+        "symfony/validator": "^7.3",
+        "symfony/webhook": "^7.3",
+        "symfony/yaml": "^7.3"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.1",
+        "mikey179/vfsstream": "^1.6",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^10.5",
+        "symfony/browser-kit": "^7.3",
+        "symfony/css-selector": "^7.3",
+        "symfony/maker-bundle": "^1.64",
+        "symfony/stopwatch": "^7.3",
+        "symfony/web-profiler-bundle": "^7.3"
+    },
+    "autoload": {
+        "psr-4": { "App\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "App\\Tests\\": "tests" }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
+        ],
+        "post-update-cmd": [
+            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
+        ],
+        "test": "vendor/bin/phpunit -c phpunit.xml.dist --no-coverage",
+        "test-with-coverage": "XDEBUG_MODE=coverage vendor/bin/phpunit -c phpunit.xml.dist  --coverage-clover clover.xml",
+        "php-cs-fixer": "vendor/bin/php-cs-fixer fix --verbose",
+        "php-cs-fixer-dry-run": "vendor/bin/php-cs-fixer fix --verbose --diff --dry-run",
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        }
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "7.3.*",
+            "docker": true
+        },
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        },
+        "incenteev-parameters": {
+            "file": "config/parameters.yml"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/satis": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
+        }
+    }
+}

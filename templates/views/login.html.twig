@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4">Satifly 🐘 - Login</h3>
+
+                        {# Symfony form start #}
+                        {{ form_start(form, {'attr': {'id': 'login_form'}}) }}
+
+                        {# Username field #}
+                        <div class="mb-3">
+                            {{ form_label(form.username, 'Username', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.username, {'attr': {'class': 'form-control', 'placeholder': 'Enter your username'}}) }}
+                            {{ form_errors(form.username) }}
+                        </div>
+
+                        {# Password field #}
+                        <div class="mb-3">
+                            {{ form_label(form.password, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.password, {'attr': {'class': 'form-control', 'placeholder': 'Enter your password'}}) }}
+                            {{ form_errors(form.password) }}
+                        </div>
+
+                        {# Submit button #}
+                        <div class="d-grid">
+                            {{ form_widget(form.login, {'attr': {'class': 'btn btn-primary'}}) }}
+                        </div>
+
+                        {{ form_end(form) }}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

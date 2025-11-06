@@ -1,0 +1,44 @@
+<div id="abandoned-collection"
+     class="abandoned-collection border rounded p-3 mt-4"
+     data-prototype="{{ form_widget(form.abandoned.vars.prototype)|e('html_attr') }}"
+     data-prototype-name="{{ form.abandoned.vars.prototype.vars.name }}"
+     data-allow-add="1"
+     data-allow-remove="1"
+     data-name-prefix="{{ form.abandoned.vars.full_name }}"
+     data-title="{{ form.abandoned.vars.attr['data-title'] ?? '' }}">
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">
+            Abandoned Packages
+            <small class="text-muted d-block" style="font-size: 0.9em;">
+                {{ form.abandoned.vars.attr['data-title'] ?? 'List of packages marked as abandoned for this repository' }}
+            </small>
+        </h5>
+        <button type="button"
+                class="btn btn-sm btn-warning add-item"
+                id="add-abandoned-item">
+            + Add Abandoned Package
+        </button>
+    </div>
+
+    <div class="abandoned-items">
+        {% for abandonedForm in form.abandoned %}
+            <div class="collection-item abandoned-item mb-2 p-2 border rounded bg-light">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-11">
+                        {{ form_widget(abandonedForm) }}
+                    </div>
+                    <div class="col-md-1 text-end">
+                        <button type="button"
+                                class="btn btn-outline-danger btn-sm remove-item"
+                                title="Remove abandoned package">
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-muted small mb-0">No abandoned packages defined.</p>
+        {% endfor %}
+    </div>
+</div>

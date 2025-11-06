@@ -1,0 +1,6 @@
+framework:
+  webhook:
+    routing:
+      package:
+        service: App\Webhook\PackageRequestParser
+        secret: '%env(PACKAGE_SECRET)%'

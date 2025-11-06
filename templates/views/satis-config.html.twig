@@ -1,0 +1,134 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Edit Satis Configuration{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-light p-2 rounded">
+            <li class="breadcrumb-item"><a href="{{ path('admin') }}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit Satis Configuration</li>
+        </ol>
+    </nav>
+
+    <h1 class="h3 mb-4">Edit Configuration</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body pb-5">
+            {{ form_start(form, { attr: { class: 'needs-validation', novalidate: true } }) }}
+
+            {# Responsive scrollable nav-tabs #}
+            <ul class="nav nav-tabs mb-4 flex-nowrap overflow-auto text-nowrap" id="configTabs" role="tablist" style="gap: .5rem;">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">
+                        General
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="require-tab" data-bs-toggle="tab" data-bs-target="#require" type="button" role="tab">
+                        Require
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="archive-tab" data-bs-toggle="tab" data-bs-target="#archive" type="button" role="tab">
+                        Archive
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="repositories-tab" data-bs-toggle="tab" data-bs-target="#repositories" type="button" role="tab">
+                        Repositories
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" data-bs-target="#advanced" type="button" role="tab">
+                        Advanced
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="configTabsContent">
+
+                {# --- GENERAL TAB --- #}
+                <div class="tab-pane fade show active" id="general" role="tabpanel">
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-4">{{ form_row(form.name) }}</div>
+                        <div class="col-12 col-md-4">{{ form_row(form.description) }}</div>
+                        <div class="col-12 col-md-4">{{ form_row(form.homepage) }}</div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-4">{{ form_row(form.outputDir) }}</div>
+                        <div class="col-12 col-md-4">{{ form_row(form.outputHtml) }}</div>
+                        <div class="col-12 col-md-4">{{ form_row(form.includeFilename) }}</div>
+                    </div>
+
+                    <hr>
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3">{{ form_row(form.requireAll) }}</div>
+                        <div class="col-6 col-md-3">{{ form_row(form.requireDependencies) }}</div>
+                        <div class="col-6 col-md-3">{{ form_row(form.requireDevDependencies) }}</div>
+                        <div class="col-6 col-md-3">{{ form_row(form.requireDependencyFilter) }}</div>
+                    </div>
+                </div>
+
+                {# --- REQUIRE TAB --- #}
+                <div class="tab-pane fade" id="require" role="tabpanel">
+                    {% include 'views/form/_require_collection.html.twig' with { form: form } %}
+                    {% include 'views/form/_blacklist_collection.html.twig' with { form: form } %}
+                    {% include 'views/form/_abandoned_collection.html.twig' with { form: form } %}
+                </div>
+
+                {# --- ARCHIVE TAB --- #}
+                <div class="tab-pane fade" id="archive" role="tabpanel">
+                    {% include 'views/form/_archive.html.twig' with { form: form.archive } %}
+                </div>
+
+                {# --- REPOSITORIES TAB --- #}
+                <div class="tab-pane fade" id="repositories" role="tabpanel">
+                    {% include 'views/form/_repositories_collection.html.twig' with { form: form } %}
+                </div>
+
+                {# --- ADVANCED TAB --- #}
+                <div class="tab-pane fade" id="advanced" role="tabpanel">
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">{{ form_row(form.minimumStability) }}</div>
+                        <div class="col-12 col-md-6">{{ form_row(form.prettyPrint) }}</div>
+                    </div>
+
+                    {% include 'views/form/_minimum_stability_collection.html.twig' with { form: form } %}
+
+                    <hr>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">{{ form_row(form.providers) }}</div>
+                        <div class="col-12 col-md-6">{{ form_row(form.twigTemplate) }}</div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">{{ form_row(form.config) }}</div>
+                        <div class="col-12 col-md-6">{{ form_row(form.notifyBatch) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-none d-md-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-save me-2"></i>Save Configuration
+                </button>
+            </div>
+
+            {# Sticky bottom save bar for mobile #}
+            <div class="d-md-none position-fixed bottom-0 start-0 end-0 bg-light border-top shadow-sm py-2 px-3 text-center" style="z-index: 1040;">
+                <button type="submit" class="btn btn-success btn-lg w-100">
+                    <i class="bi bi-save me-2"></i>Save Configuration
+                </button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+    <script src="{{ asset('js/collection-handler.js') }}"></script>
+{% endblock %}

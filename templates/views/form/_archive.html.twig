@@ -1,0 +1,121 @@
+<div class="card mt-4">
+    <div class="card-header bg-light">
+        <h4 class="mb-0">Archive Configuration</h4>
+        <small class="text-muted">Configure how Satis generates and manages package archives.</small>
+    </div>
+
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form_row(form.directory) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.format) }}
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form_row(form.absoluteDirectory) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.prefixUrl) }}
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-3">{{ form_row(form.skipDev) }}</div>
+            <div class="col-md-3">{{ form_row(form.checksum) }}</div>
+            <div class="col-md-3">{{ form_row(form.ignoreFilters) }}</div>
+            <div class="col-md-3">{{ form_row(form.overrideDistType) }}</div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-3">{{ form_row(form.rearchive) }}</div>
+        </div>
+
+        {# Include whitelist collection #}
+        <div id="archive-whitelist-collection"
+             class="archive-whitelist-collection border rounded p-3 mt-4"
+             data-prototype="{{ form_widget(form.whitelist.vars.prototype)|e('html_attr') }}"
+             data-prototype-name="{{ form.whitelist.vars.prototype.vars.name }}"
+             data-allow-add="1"
+             data-allow-remove="1">
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">
+                    Archive Whitelist
+                    <small class="text-muted d-block" style="font-size: 0.9em;">
+                        Define which packages should always be included when generating archives.
+                    </small>
+                </h5>
+                <button type="button"
+                        class="btn btn-sm btn-primary add-item"
+                        id="add-archive-whitelist-item">
+                    + Add Whitelisted Package
+                </button>
+            </div>
+
+            <div class="archive-whitelist-items">
+                {% for field in form.whitelist %}
+                    <div class="collection-item whitelist-item mb-2 p-2 border rounded bg-light">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-11">{{ form_widget(field) }}</div>
+                            <div class="col-md-1 text-end">
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm remove-item"
+                                        title="Remove whitelisted package">
+                                    &times;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-muted small mb-0">No whitelisted packages defined.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# Include blacklist collection #}
+        <div id="archive-blacklist-collection"
+             class="archive-blacklist-collection border rounded p-3 mt-4"
+             data-prototype="{{ form_widget(form.blacklist.vars.prototype)|e('html_attr') }}"
+             data-prototype-name="{{ form.blacklist.vars.prototype.vars.name }}"
+             data-allow-add="1"
+             data-allow-remove="1">
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">
+                    Archive Blacklist
+                    <small class="text-muted d-block" style="font-size: 0.9em;">
+                        Specify packages that should be excluded from archive generation.
+                    </small>
+                </h5>
+                <button type="button"
+                        class="btn btn-sm btn-primary add-item"
+                        id="add-archive-blacklist-item">
+                    + Add Blacklisted Package
+                </button>
+            </div>
+
+            <div class="archive-blacklist-items">
+                {% for field in form.blacklist %}
+                    <div class="collection-item blacklist-item mb-2 p-2 border rounded bg-light">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-11">{{ form_widget(field) }}</div>
+                            <div class="col-md-1 text-end">
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm remove-item"
+                                        title="Remove blacklisted package">
+                                    &times;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-muted small mb-0">No blacklisted packages defined.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

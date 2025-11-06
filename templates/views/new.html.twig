@@ -1,0 +1,55 @@
+{% extends "base.html.twig" %}
+
+{% block title %}New Repository{% endblock %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb" class="mt-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin') }}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Add New Repository</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm my-4">
+        <div class="card-header bg-light d-flex align-items-center">
+            <i class="bi bi-plus-circle text-primary me-2"></i>
+            <h5 class="mb-0">Register a New Repository</h5>
+        </div>
+
+        <div class="card-body">
+            <p class="text-muted mb-4">
+                Add a new repository to your Satis configuration.
+                Provide the basic information so it can be tracked and mirrored automatically.
+            </p>
+
+            {{ form_start(form, {'attr': {'id': 'new_repository', 'class': 'needs-validation', 'novalidate': true}}) }}
+            {{ form_errors(form) }}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {{ form_row(form.name, {'label': 'Repository Name'}) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.type, {'label': 'Repository Type'}) }}
+                </div>
+            </div>
+
+            <div class="mt-3">
+                {{ form_row(form.url, {'label': 'Repository URL'}) }}
+            </div>
+
+            <div class="mt-3">
+                {{ form_row(form.installationSource, {'label': 'Installation Source'}) }}
+            </div>
+
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-check-circle me-2"></i>Register Repository
+                </button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+{% endblock %}

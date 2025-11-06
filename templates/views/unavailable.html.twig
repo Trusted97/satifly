@@ -1,0 +1,16 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Composer Repository currently not available{% endblock %}
+
+{% block content %}
+
+    <div class="my-3 alert alert-info alert-dismissible fade show role="alert">
+        Maybe <strong>Satis</strong> was not started before or did not build a valid <code>package.json</code> file yet.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <a href="{{ path('admin') }}" class="btn btn-large btn-block btn-primary">
+        Manage Repositories
+    </a>
+
+{% endblock %}

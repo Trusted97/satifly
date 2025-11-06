@@ -1,0 +1,47 @@
+<div id="blacklist-collection"
+     class="blacklist-collection border rounded p-3 mt-4"
+     data-prototype="{{ form_widget(form.blacklist.vars.prototype)|e('html_attr') }}"
+     data-prototype-name="{{ form.blacklist.vars.prototype.vars.name }}"
+     data-allow-add="1"
+     data-allow-remove="1"
+     data-name-prefix="{{ form.blacklist.vars.full_name }}"
+     data-title="{{ form.blacklist.vars.attr['data-title'] ?? '' }}">
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">
+            Blacklist
+            <small class="text-muted d-block" style="font-size: 0.9em;">
+                {{ form.blacklist.vars.attr['data-title'] ?? 'Packages to exclude after selecting packages' }}
+            </small>
+        </h5>
+        <button type="button"
+                class="btn btn-sm btn-secondary add-item"
+                id="add-blacklist-item">
+            + Add Excluded Package
+        </button>
+    </div>
+
+    <div class="blacklist-items">
+        {% for constraintForm in form.blacklist %}
+            <div class="collection-item package-constraint-item mb-2 p-2 border rounded bg-light">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-6">
+                        {{ form_row(constraintForm.package) }}
+                    </div>
+                    <div class="col-md-5">
+                        {{ form_row(constraintForm.constraint) }}
+                    </div>
+                    <div class="col-md-1 text-end">
+                        <button type="button"
+                                class="btn btn-outline-danger btn-sm remove-item"
+                                title="Remove constraint">
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-muted small mb-0">No packages in blacklist.</p>
+        {% endfor %}
+    </div>
+</div>

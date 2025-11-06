@@ -1,0 +1,46 @@
+<div id="minimum-stability-collection"
+     class="minimum-stability-collection border rounded p-3 mt-4"
+     data-prototype="{{ form_widget(form.minimumStabilityPerPackage.vars.prototype)|e('html_attr') }}"
+     data-prototype-name="{{ form.minimumStabilityPerPackage.vars.prototype.vars.name }}"
+     data-allow-add="1"
+     data-allow-remove="1"
+     data-name-prefix="{{ form.minimumStabilityPerPackage.vars.full_name }}">
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">
+            Minimum Stability per Package
+            <small class="text-muted d-block" style="font-size: 0.9em;">
+                Define a custom minimum stability for specific packages.
+            </small>
+        </h5>
+        <button type="button"
+                class="btn btn-sm btn-info add-item"
+                id="add-minimum-stability-item">
+            + Add Package Stability
+        </button>
+    </div>
+
+    <div class="minimum-stability-items">
+        {% for stabilityForm in form.minimumStabilityPerPackage %}
+            <div class="collection-item package-stability-item mb-2 p-2 border rounded bg-light">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-6">
+                        {{ form_row(stabilityForm.package) }}
+                    </div>
+                    <div class="col-md-5">
+                        {{ form_row(stabilityForm.stability) }}
+                    </div>
+                    <div class="col-md-1 text-end">
+                        <button type="button"
+                                class="btn btn-outline-danger btn-sm remove-item"
+                                title="Remove package stability">
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-muted small mb-0">No package-specific stability defined.</p>
+        {% endfor %}
+    </div>
+</div>

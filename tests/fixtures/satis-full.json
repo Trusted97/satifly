@@ -1,0 +1,46 @@
+{
+  "name": "Test",
+  "description": "Test repository",
+  "homepage": "http:\/\/test.com",
+  "output-dir": ".\/web",
+  "repositories": [
+    {
+      "type": "git",
+      "url": "git@github.com:ludofleury\/satisfy.git",
+      "name": "ludofleury\/satisfy.git"
+    }
+  ],
+  "require": {
+    "ludofleury\/satisfy":"*"
+  },
+  "abandoned": {
+    "psr/log": true,
+    "psr/container": "psr/constainer2"
+  },
+  "blacklist": {
+    "psr/log": "0.x"
+  },
+  "require-all": true,
+  "require-dependencies": true,
+  "require-dev-dependencies": false,
+  "archive": {
+    "directory": "dist",
+    "skip-dev": false,
+    "checksum": true,
+    "format": "zip",
+    "whitelist": [],
+    "blacklist": [],
+    "prefix-url": "http://test.com"
+  },
+  "config": {
+    "process-timeout": 600
+  },
+  "providers": true,
+  "providers-history-size": 1,
+  "minimum-stability": "dev",
+  "minimum-stability-per-package": {
+    "psr/log": "stable"
+  },
+  "_comment": "",
+  "pretty-print": true
+}

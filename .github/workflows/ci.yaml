@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: ~
+  workflow_dispatch: ~
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: 🧪 Run Tests & Code Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      # 🔹 Preparazione
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: 🧰 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 🔹 Build
+      - name: 🏗️ Build Docker images
+        uses: docker/bake-action@v6
+        with:
+          pull: true
+          load: true
+          files: |
+            compose.yaml
+            compose.override.yaml
+          set: |
+            *.cache-from=type=gha,scope=${{github.ref}}
+            *.cache-from=type=gha,scope=refs/heads/main
+            *.cache-to=type=gha,scope=${{github.ref}},mode=max
+
+      # 🔹 Start services
+      - name: 🚀 Start services
+        run: docker compose up --wait --no-build
+      - name: 🌐 Check HTTP reachability
+        run: curl -v --fail-with-body http://localhost
+
+      # 🔹 Test
+      - name: 📝 Run PHPUnit tests with coverage
+        run: docker compose exec -it php composer test-with-coverage
+
+      # 🔹 Code quality
+      - name: 🎨 Run PHPCSFixer dry-run
+        run: docker compose exec -it php composer php-cs-fixer-dry-run
+
+      # 🔹 Coverage upload
+      - name: ☁️ Upload coverage reports to Codecov
+        uses: qltysh/qlty-action/coverage@v2
+        with:
+          token: ${{secrets.QLTY_COVERAGE_TOKEN}}
+          files: clover.xml
+          strip-prefix: /app
+          command: publish

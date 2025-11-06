@@ -1,0 +1,5 @@
+parameters:
+    satis_filename: "%env(resolve:SATIS_CONFIG)%"
+    satis_log_path: "%env(resolve:SATIS_LOG)%"
+    composer.home: "%env(resolve:COMPOSER_HOME)%"
+    composer.cache: "%env(resolve:COMPOSER_CACHE)%"
