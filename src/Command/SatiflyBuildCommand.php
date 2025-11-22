@@ -4,6 +4,7 @@ namespace App\Command;
 
 use Composer\Json\JsonFile;
 use Composer\Satis\Console\Application;
+use Seld\JsonLint\ParsingException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -15,10 +16,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 #[AsCommand(
-    name: 'satifly:rebuild',
-    description: 'Rebuild composer packages when config is changed or definitions is outdated'
+    name: 'satifly:build',
+    description: 'Build composer packages using Satis, with optional caching'
 )]
-class RebuildCommand extends Command
+class SatiflyBuildCommand extends Command
 {
     public function __construct(public ParameterBagInterface $parameterBag)
     {
@@ -41,16 +42,28 @@ class RebuildCommand extends Command
                 'l',
                 InputOption::VALUE_OPTIONAL,
                 'Maximum lifetime of composer definitions in seconds'
+            )
+            ->addOption(
+                'no-cache',
+                null,
+                InputOption::VALUE_NONE,
+                'Ignore cache and force a full rebuild'
             );
     }
 
+    /**
+     * @throws ParsingException
+     * @throws \JsonException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        $verbose = $output->isVerbose() || $output->isVeryVerbose() || $output->isDebug();
 
-        $io->title('⚙️  Starting Satis rebuild process...');
+        $io->title('⚙️  Starting Satis build process...');
         $configFile = $this->parameterBag->get('satis_filename');
         $lifetime   = (int) $input->getOption('lifetime');
+        $noCache    = (bool) $input->getOption('no-cache');
         $outputDir  = $input->getArgument('output-dir');
 
         $io->writeln("📄 Using config file: <info>{$configFile}</info>");
@@ -59,25 +72,56 @@ class RebuildCommand extends Command
             $io->writeln("📦 Output directory: <info>{$outputDir}</info>");
         }
 
-        if (!empty($lifetime) && \is_file($configFile)) {
+        // ---- VERBOSE DEBUG INFO ----
+        if ($verbose) {
+            $io->writeln("🔎 Verbose mode enabled");
+            $io->writeln("🔧 Lifetime: " . ($lifetime ?: "none"));
+            $io->writeln("⛔ No Cache Option: " . ($noCache ? "yes" : "no"));
+        }
+
+        // ---- CACHING LOGIC ----
+        if (!$noCache && !empty($lifetime) && \is_file($configFile)) {
             if (!$outputDir) {
                 $file      = new JsonFile($configFile);
                 $config    = $file->read();
                 $outputDir = $config['output-dir'] ?? null;
+
                 $io->writeln("📁 Resolved output directory: <info>{$outputDir}</info>");
             }
 
             $modifiedAt = \filemtime($configFile);
             $lastUpdate = @\filemtime($outputDir . '/packages.json');
-            if ($modifiedAt < $lastUpdate && \time() - $lastUpdate < $lifetime) {
-                $io->success('✅ Cache is still valid — skipping rebuild.');
 
+            if ($verbose) {
+                $io->writeln("🕒 Config file last modified: {$modifiedAt}");
+                $io->writeln("📦 packages.json last update: " . ($lastUpdate ?: "not found"));
+            }
+
+            if ($lastUpdate && $modifiedAt < $lastUpdate && \time() - $lastUpdate < $lifetime) {
+                $io->success('✅ Cache is still valid — skipping build.');
                 return 0;
+            }
+
+            if ($verbose) {
+                $io->writeln("⚠️ Cache expired, triggering rebuild");
             }
         }
 
+        if ($noCache) {
+            $io->writeln('⛔ Cache ignored due to <info>--no-cache</info> option.');
+        }
+
+        // ---- EXECUTE SATIS BUILD ----
         $io->section('🚀 Building Satis repository...');
-        $startTime  = \microtime(true);
+        $startTime = \microtime(true);
+
+        if ($verbose) {
+            $io->writeln("📂 Running Satis build with:");
+            $io->writeln("- file: {$configFile}");
+            $io->writeln("- output-dir: " . ($outputDir ?: "null"));
+            $io->writeln("- packages: " . \json_encode($input->getArgument('packages'), JSON_THROW_ON_ERROR));
+        }
+
         $satisInput = new ArrayInput([
             'command'       => 'build',
             'file'          => $configFile,
@@ -88,13 +132,13 @@ class RebuildCommand extends Command
 
         $exitCode = (new Application())->doRun($satisInput, $output);
 
-        $duration      = \microtime(true) - $startTime;
+        $duration = \microtime(true) - $startTime;
         $formattedTime = \number_format($duration, 2);
 
         if (Command::SUCCESS === $exitCode) {
-            $io->success("🎉 Satis rebuild completed successfully in ⏱️ {$formattedTime}s !");
+            $io->success("🎉 Satis build completed successfully in ⏱️ {$formattedTime}s !");
         } else {
-            $io->error('❌ Satis rebuild failed. Check the output above for details.');
+            $io->error('❌ Satis build failed. Check the output above for details.');
         }
 
         return $exitCode;
