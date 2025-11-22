@@ -14,6 +14,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 
 #[AsCommand(
     name: 'satifly:build',
@@ -21,9 +23,15 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 )]
 class SatiflyBuildCommand extends Command
 {
-    public function __construct(public ParameterBagInterface $parameterBag)
+    protected LockInterface $lock;
+
+    public function __construct(
+        public ParameterBagInterface $parameterBag,
+        public LockFactory $buildLockFactory,
+    )
     {
         parent::__construct();
+        $this->lock = $buildLockFactory->createLock('build');
     }
 
     protected function configure(): void
@@ -57,6 +65,8 @@ class SatiflyBuildCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->lock->acquire(true);
+
         $io      = new SymfonyStyle($input, $output);
         $verbose = $output->isVerbose() || $output->isVeryVerbose() || $output->isDebug();
 
@@ -142,6 +152,7 @@ class SatiflyBuildCommand extends Command
             $io->error('❌ Satis build failed. Check the output above for details.');
         }
 
+        $this->lock->release();
         return $exitCode;
     }
 }
