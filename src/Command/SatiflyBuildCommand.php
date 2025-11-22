@@ -57,7 +57,7 @@ class SatiflyBuildCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $io      = new SymfonyStyle($input, $output);
         $verbose = $output->isVerbose() || $output->isVeryVerbose() || $output->isDebug();
 
         $io->title('⚙️  Starting Satis build process...');
@@ -74,9 +74,9 @@ class SatiflyBuildCommand extends Command
 
         // ---- VERBOSE DEBUG INFO ----
         if ($verbose) {
-            $io->writeln("🔎 Verbose mode enabled");
-            $io->writeln("🔧 Lifetime: " . ($lifetime ?: "none"));
-            $io->writeln("⛔ No Cache Option: " . ($noCache ? "yes" : "no"));
+            $io->writeln('🔎 Verbose mode enabled');
+            $io->writeln('🔧 Lifetime: ' . ($lifetime ?: 'none'));
+            $io->writeln('⛔ No Cache Option: ' . ($noCache ? 'yes' : 'no'));
         }
 
         // ---- CACHING LOGIC ----
@@ -94,16 +94,17 @@ class SatiflyBuildCommand extends Command
 
             if ($verbose) {
                 $io->writeln("🕒 Config file last modified: {$modifiedAt}");
-                $io->writeln("📦 packages.json last update: " . ($lastUpdate ?: "not found"));
+                $io->writeln('📦 packages.json last update: ' . ($lastUpdate ?: 'not found'));
             }
 
             if ($lastUpdate && $modifiedAt < $lastUpdate && \time() - $lastUpdate < $lifetime) {
                 $io->success('✅ Cache is still valid — skipping build.');
+
                 return 0;
             }
 
             if ($verbose) {
-                $io->writeln("⚠️ Cache expired, triggering rebuild");
+                $io->writeln('⚠️ Cache expired, triggering rebuild');
             }
         }
 
@@ -116,10 +117,10 @@ class SatiflyBuildCommand extends Command
         $startTime = \microtime(true);
 
         if ($verbose) {
-            $io->writeln("📂 Running Satis build with:");
+            $io->writeln('📂 Running Satis build with:');
             $io->writeln("- file: {$configFile}");
-            $io->writeln("- output-dir: " . ($outputDir ?: "null"));
-            $io->writeln("- packages: " . \json_encode($input->getArgument('packages'), JSON_THROW_ON_ERROR));
+            $io->writeln('- output-dir: ' . ($outputDir ?: 'null'));
+            $io->writeln('- packages: ' . \json_encode($input->getArgument('packages'), \JSON_THROW_ON_ERROR));
         }
 
         $satisInput = new ArrayInput([
@@ -132,7 +133,7 @@ class SatiflyBuildCommand extends Command
 
         $exitCode = (new Application())->doRun($satisInput, $output);
 
-        $duration = \microtime(true) - $startTime;
+        $duration      = \microtime(true) - $startTime;
         $formattedTime = \number_format($duration, 2);
 
         if (Command::SUCCESS === $exitCode) {
