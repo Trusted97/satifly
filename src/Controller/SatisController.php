@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Form\SatisConfigType;
-use App\Http\ProcessResponse;
+use App\Process\ProcessResponse;
 use App\Service\RepositoryManager;
 use App\Service\SatisManager;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;

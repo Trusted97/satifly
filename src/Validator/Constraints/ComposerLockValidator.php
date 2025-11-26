@@ -15,13 +15,16 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  */
 class ComposerLockValidator extends ConstraintValidator
 {
-    public function validate($data, Constraint $constraint)
+    /**
+     * @throws \JsonException
+     */
+    public function validate($value, Constraint $constraint): void
     {
-        if (!\is_object($data) || !$data instanceof UploadedFile) {
-            throw new InvalidArgumentException(\sprintf('This validator expects a UploadedFile, given "%s"', $data::class));
+        if (!\is_object($value) || !$value instanceof UploadedFile) {
+            throw new InvalidArgumentException(\sprintf('This validator expects a UploadedFile, given "%s"', $value::class));
         }
 
-        $composerData = \json_decode(\file_get_contents($data->openFile()->getRealPath()));
+        $composerData = \json_decode(\file_get_contents($value->openFile()->getRealPath()), false, 512, \JSON_THROW_ON_ERROR);
         $schema       = null;
         if ($constraint instanceof ComposerLock) {
             $schema = $this->getSchema($constraint->getSchemaPath());
@@ -30,7 +33,7 @@ class ComposerLockValidator extends ConstraintValidator
         // In version 1.1.0 of the validator, "required" attributes are not used.
         // So data structure might be partially unset.
         $validator = new Validator();
-        $validator->check($composerData, $schema);
+        $validator->validate($composerData, $schema);
 
         if (!$validator->isValid()) {
             $this->context->addViolation('Invalid composer.lock file given:');

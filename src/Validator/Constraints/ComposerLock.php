@@ -4,11 +4,7 @@ namespace App\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-/**
- * @Annotation
- *
- * @author Julius Beckmann <php@h4cc.de>
- */
+#[\Attribute]
 class ComposerLock extends Constraint
 {
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http;
+namespace App\Process;
 
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
