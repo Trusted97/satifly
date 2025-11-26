@@ -4,7 +4,6 @@ namespace App\Service;
 
 final class SatisCommandBuilder
 {
-    private string $satisBinary     = 'vendor/bin/satis';
     private ?string $repositoryName = null;
 
     /** @var string[] */
@@ -61,7 +60,7 @@ final class SatisCommandBuilder
     public function build(): array
     {
         $command = [
-            $this->satisBinary,
+            'vendor/bin/satis',
             'build',
             $this->configFile,
             $this->outputDir,
