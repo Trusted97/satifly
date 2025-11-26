@@ -49,25 +49,7 @@
 
                 {# --- GENERAL TAB --- #}
                 <div class="tab-pane fade show active" id="general" role="tabpanel">
-                    <div class="row g-3 mb-3">
-                        <div class="col-12 col-md-4">{{ form_row(form.name) }}</div>
-                        <div class="col-12 col-md-4">{{ form_row(form.description) }}</div>
-                        <div class="col-12 col-md-4">{{ form_row(form.homepage) }}</div>
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-12 col-md-4">{{ form_row(form.outputDir) }}</div>
-                        <div class="col-12 col-md-4">{{ form_row(form.outputHtml) }}</div>
-                        <div class="col-12 col-md-4">{{ form_row(form.includeFilename) }}</div>
-                    </div>
-
-                    <hr>
-                    <div class="row g-3">
-                        <div class="col-6 col-md-3">{{ form_row(form.requireAll) }}</div>
-                        <div class="col-6 col-md-3">{{ form_row(form.requireDependencies) }}</div>
-                        <div class="col-6 col-md-3">{{ form_row(form.requireDevDependencies) }}</div>
-                        <div class="col-6 col-md-3">{{ form_row(form.requireDependencyFilter) }}</div>
-                    </div>
+                    {% include 'views/form/_general.html.twig' with { form: form } %}
                 </div>
 
                 {# --- REQUIRE TAB --- #}

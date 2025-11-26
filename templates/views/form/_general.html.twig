@@ -1,0 +1,21 @@
+<div class="card mt-4">
+    <div class="card-header bg-light">
+        <h4 class="mb-0">General Configuration</h4>
+        <small class="text-muted">Configure the basic settings for your Satis project.</small>
+    </div>
+
+    <div class="card-body d-grid gap-3">
+        {{ form_row(form.name) }}
+        {{ form_row(form.description) }}
+        {{ form_row(form.homepage) }}
+
+        {{ form_row(form.outputDir) }}
+        {{ form_row(form.includeFilename) }}
+
+        {{ form_row(form.outputHtml) }}
+        {{ form_row(form.requireAll) }}
+        {{ form_row(form.requireDependencies) }}
+        {{ form_row(form.requireDevDependencies) }}
+        {{ form_row(form.requireDependencyFilter) }}
+    </div>
+</div>

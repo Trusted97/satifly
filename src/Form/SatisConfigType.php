@@ -21,6 +21,7 @@ class SatisConfigType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'required'    => true,
+                'help'        => 'Package name in vendor/name format.',
                 'constraints' => [
                     new Assert\NotBlank(),
                     new Assert\Regex('#[a-z0-9]([_.-]?[a-z0-9]+)*/[a-z0-9]([_.-]?[a-z0-9]+)*#'),
@@ -29,9 +30,11 @@ class SatisConfigType extends AbstractType
             ->add('description', TextareaType::class, [
                 'required'   => false,
                 'empty_data' => '',
+                'help'       => 'Short description of the Satis repository.',
             ])
             ->add('homepage', UrlType::class, [
                 'required'    => true,
+                'help'        => 'Homepage URL for this Satis instance.',
                 'constraints' => [
                     new Assert\NotBlank(),
                 ],
@@ -48,8 +51,8 @@ class SatisConfigType extends AbstractType
                 ],
             ])
             ->add('archive', ArchiveType::class, [
-                'required'     => false,
-                'label'        => false,
+                'required' => false,
+                'label'    => false,
             ])
             ->add('blacklist', CollectionType::class, [
                 'entry_type'   => PackageConstraintType::class,
@@ -75,15 +78,19 @@ class SatisConfigType extends AbstractType
             ])
             ->add('requireAll', CheckboxType::class, [
                 'required' => false,
+                'help'     => 'Include all packages from all repositories.',
             ])
             ->add('requireDependencies', CheckboxType::class, [
                 'required' => false,
+                'help'     => 'Automatically include required dependencies.',
             ])
             ->add('requireDevDependencies', CheckboxType::class, [
                 'required' => false,
+                'help'     => 'Include development dependencies.',
             ])
             ->add('requireDependencyFilter', CheckboxType::class, [
                 'required' => false,
+                'help'     => 'Exclude packages not explicitly required.',
             ])
             ->add('repositories', CollectionType::class, [
                 'entry_type'   => RepositoryType::class,
@@ -92,6 +99,7 @@ class SatisConfigType extends AbstractType
                 'by_reference' => false,
                 'prototype'    => true,
                 'label'        => false,
+                'help'         => 'List of Composer repositories used as sources.',
                 'constraints'  => [
                     new Assert\Valid(),
                 ],
@@ -99,6 +107,7 @@ class SatisConfigType extends AbstractType
             ->add('minimumStability', ChoiceType::class, [
                 'required'    => false,
                 'choices'     => PackageStabilityType::STABILITY_LEVELS,
+                'help'        => 'Minimum stability level allowed for packages.',
                 'constraints' => [
                     new Assert\Choice(['choices' => PackageStabilityType::STABILITY_LEVELS]),
                 ],
@@ -116,6 +125,7 @@ class SatisConfigType extends AbstractType
             ])
             ->add('includeFilename', TextType::class, [
                 'required' => false,
+                'help'     => 'Optional custom filename for the include file.',
                 'attr'     => [
                     'rel'        => 'tooltip',
                     'data-title' => <<<END
@@ -125,6 +135,7 @@ END,
             ])
             ->add('outputDir', TextType::class, [
                 'required'    => true,
+                'help'        => 'Directory where Satis will write generated files.',
                 'constraints' => [
                     new Assert\NotBlank(),
                 ],
@@ -133,9 +144,11 @@ END,
             ->add('outputHtml', CheckboxType::class, [
                 'required' => false,
                 'label'    => 'Output HTML',
+                'help'     => 'Generate the static HTML front-end.',
             ])
             ->add('providers', CheckboxType::class, [
                 'required' => false,
+                'help'     => 'If enabled, dump package provider metadata.',
                 'attr'     => [
                     'rel'        => 'tooltip',
                     'data-title' => 'If enabled, dump package providers',
@@ -145,17 +158,21 @@ END,
                 'required'   => false,
                 'empty_data' => '',
                 'trim'       => true,
+                'help'       => 'Additional Composer configuration (JSON).',
             ])
             ->add('twigTemplate', TextType::class, [
                 'required' => false,
+                'help'     => 'Custom Twig template for the HTML output.',
             ])
             ->add('notifyBatch', UrlType::class, [
                 'label'    => 'Notify batch URL',
                 'required' => false,
+                'help'     => 'URL used for Composer notification batches.',
             ])
             ->add('prettyPrint', CheckboxType::class, [
                 'label'    => 'Pretty print',
                 'required' => false,
+                'help'     => 'Pretty-print JSON output.',
             ])
         ;
     }
