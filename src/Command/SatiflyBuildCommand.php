@@ -28,8 +28,7 @@ class SatiflyBuildCommand extends Command
     public function __construct(
         public ParameterBagInterface $parameterBag,
         public LockFactory $buildLockFactory,
-    )
-    {
+    ) {
         parent::__construct();
         $this->lock = $buildLockFactory->createLock('build');
     }
@@ -153,6 +152,7 @@ class SatiflyBuildCommand extends Command
         }
 
         $this->lock->release();
+
         return $exitCode;
     }
 }
