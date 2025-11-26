@@ -1,0 +1,42 @@
+<div class="card mt-4">
+    <div class="card-header bg-light">
+        <h4 class="mb-0">Stability Settings</h4>
+        <small class="text-muted">
+            Configure global and per-package stability levels.
+        </small>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-md-6">{{ form_row(form.minimumStability) }}</div>
+            <div class="col-12 col-md-6">{{ form_row(form.prettyPrint) }}</div>
+        </div>
+
+        {% include 'views/form/_minimum_stability_collection.html.twig' with { form: form } %}
+
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-light">
+        <h4 class="mb-0">Advanced Settings</h4>
+        <small class="text-muted">
+            Additional configuration options for Satis output and behavior.
+        </small>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-md-6">{{ form_row(form.twigTemplate) }}</div>
+            <div class="col-12 col-md-6">{{ form_row(form.config) }}</div>
+            <div class="col-12 col-md-6">{{ form_row(form.notifyBatch) }}</div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-12 col-md-6">{{ form_row(form.providers) }}</div>
+        </div>
+
+    </div>
+</div>

@@ -1,44 +1,55 @@
-<div id="repositories-collection"
-     class="repositories-collection border rounded p-3 mt-4"
-     data-prototype="{{ form_widget(form.repositories.vars.prototype)|e('html_attr') }}"
-     data-prototype-name="{{ form.repositories.vars.prototype.vars.name }}"
-     data-allow-add="1"
-     data-allow-remove="1"
-     data-name-prefix="{{ form.repositories.vars.full_name }}"
-     data-title="{{ form.repositories.vars.attr['data-title'] ?? '' }}">
-
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">
-            Repositories
-            <small class="text-muted d-block" style="font-size: 0.9em;">
-                {{ form.repositories.vars.attr['data-title'] ?? 'List of repositories used by Satis to fetch packages' }}
-            </small>
-        </h5>
-        <button type="button"
-                class="btn btn-sm btn-outline-primary add-item"
-                id="add-repository-item">
-            + Add Repository
-        </button>
+<div class="card mt-4">
+    <div class="card-header bg-light">
+        <h4 class="mb-0">Repositories</h4>
+        <small class="text-muted">
+            List of repositories used by Satis to fetch packages
+        </small>
     </div>
 
-    <div class="repositories-items">
-        {% for repoForm in form.repositories %}
-            <div class="collection-item repository-item mb-2 p-2 border rounded bg-light">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-11">
-                        {{ form_widget(repoForm) }}
-                    </div>
-                    <div class="col-md-1 text-end">
-                        <button type="button"
-                                class="btn btn-outline-danger btn-sm remove-item"
-                                title="Remove repository">
-                            &times;
-                        </button>
-                    </div>
-                </div>
+    <div class="card-body">
+
+        <div id="repositories-collection"
+             class="repositories-collection"
+             data-prototype="{{ form_widget(form.repositories.vars.prototype)|e('html_attr') }}"
+             data-prototype-name="{{ form.repositories.vars.prototype.vars.name }}"
+             data-allow-add="1"
+             data-allow-remove="1"
+             data-name-prefix="{{ form.repositories.vars.full_name }}"
+             data-title="{{ form.repositories.vars.attr['data-title'] ?? '' }}">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">
+                    List
+                </h5>
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary add-item"
+                        id="add-repository-item">
+                    + Add Repository
+                </button>
             </div>
-        {% else %}
-            <p class="text-muted small mb-0">No repositories defined.</p>
-        {% endfor %}
+
+            <div class="repositories-items">
+                {% for repoForm in form.repositories %}
+                    <div class="collection-item repository-item mb-3 p-3 border rounded bg-light">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-11">
+                                {{ form_widget(repoForm) }}
+                            </div>
+                            <div class="col-md-1 text-end">
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm remove-item"
+                                        title="Remove repository">
+                                    &times;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-muted small mb-0">No repositories defined.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+
     </div>
 </div>
