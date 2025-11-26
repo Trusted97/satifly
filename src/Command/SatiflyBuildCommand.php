@@ -21,7 +21,7 @@ use Symfony\Component\Lock\LockInterface;
     name: 'satifly:build',
     description: 'Build composer packages using Satis, with optional caching'
 )]
-class SatiflyBuildCommand extends Command
+final class SatiflyBuildCommand extends Command
 {
     protected LockInterface $lock;
 

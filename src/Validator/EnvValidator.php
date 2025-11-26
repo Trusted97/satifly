@@ -5,7 +5,7 @@ namespace App\Validator;
 use App\Service\RepositoryManager;
 use Symfony\Component\Filesystem\Filesystem;
 
-class EnvValidator
+final class EnvValidator implements EnvironmentValidatorInterface
 {
     private string $basePath;
 

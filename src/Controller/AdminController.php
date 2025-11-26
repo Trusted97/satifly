@@ -9,6 +9,7 @@ use App\Form\DeleteFormType;
 use App\Form\RepositoryType;
 use App\Service\LockProcessor;
 use App\Service\RepositoryManager;
+use App\Validator\EnvValidator;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,10 +27,10 @@ class AdminController extends AbstractProtectedController
     }
 
     #[Route('/admin', name: 'admin', methods: ['GET'])]
-    public function indexAction(): Response
+    public function indexAction(EnvValidator $validator): Response
     {
         $this->checkAccess();
-        $this->checkEnvironment();
+        $this->checkEnvironment($validator);
 
         $repositories  = $this->repositoryManager->getRepositories();
         $isAuthEnabled = $this->parameterBag->get('admin.auth');
@@ -169,12 +170,10 @@ class AdminController extends AbstractProtectedController
             }
         }
 
-        return $this->render(
-            'views/delete.html.twig', [
-                'form'          => $form->createView(),
-                'repository'    => $repository,
-                'isAuthEnabled' => $isAuthEnabled,
-            ]
-        );
+        return $this->render('views/delete.html.twig', [
+            'form'          => $form->createView(),
+            'repository'    => $repository,
+            'isAuthEnabled' => $isAuthEnabled,
+        ]);
     }
 }

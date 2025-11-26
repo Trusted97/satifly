@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\RepositoryManager;
+use App\Validator\EnvironmentValidatorInterface;
 use App\Validator\EnvValidator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -20,9 +21,8 @@ abstract class AbstractProtectedController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
     }
 
-    protected function checkEnvironment(): void
+    protected function checkEnvironment(EnvironmentValidatorInterface $validator): void
     {
-        $validator = $this->container->get(EnvValidator::class);
         try {
             $validator->validate();
         } catch (\RuntimeException $exception) {

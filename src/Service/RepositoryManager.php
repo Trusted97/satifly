@@ -11,11 +11,6 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 
-/**
- * Satis configuration definition manager
- *
- * @author Ludovic Fleury <ludo.fleury@gmail.com>
- */
 class RepositoryManager
 {
     private LockInterface $lock;

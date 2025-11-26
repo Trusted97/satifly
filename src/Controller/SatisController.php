@@ -23,10 +23,9 @@ class SatisController extends AbstractProtectedController
         $this->checkAccess();
         $isAuthEnabled = $this->parameterBag->get('admin.auth');
 
-        return $this->render('views/satis-build.html.twig',
-            [
-                'isAuthEnabled' => $isAuthEnabled,
-            ]);
+        return $this->render('views/satis-build.html.twig', [
+            'isAuthEnabled' => $isAuthEnabled,
+        ]);
     }
 
     #[Route('/admin/satis/buildRun', name: 'satis_build_run', methods: ['GET'])]
@@ -57,12 +56,9 @@ class SatisController extends AbstractProtectedController
             $this->addFlash('success', 'Configuration saved!');
         }
 
-        return $this->render(
-            'views/satis-config.html.twig',
-            [
-                'form'          => $form->createView(),
-                'isAuthEnabled' => $isAuthEnabled,
-            ]
-        );
+        return $this->render('views/satis-config.html.twig', [
+            'form'          => $form->createView(),
+            'isAuthEnabled' => $isAuthEnabled,
+        ]);
     }
 }
