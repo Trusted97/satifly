@@ -23,4 +23,14 @@ class Abandoned
     {
         return $this->replacement;
     }
+
+    public function setPackage(string $package): void
+    {
+        $this->package = $package;
+    }
+
+    public function setReplacement(?string $replacement): void
+    {
+        $this->replacement = $replacement;
+    }
 }

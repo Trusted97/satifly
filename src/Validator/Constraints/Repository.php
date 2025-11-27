@@ -6,7 +6,6 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
- *
  */
 class Repository extends Constraint
 {
