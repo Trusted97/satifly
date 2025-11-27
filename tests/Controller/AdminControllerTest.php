@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminControllerTest extends WebTestCase
+final class AdminControllerTest extends WebTestCase
 {
     use VfsTrait;
 
@@ -24,100 +24,93 @@ class AdminControllerTest extends WebTestCase
         parent::tearDown();
     }
 
-    /**
-     * @throws \JsonException
-     */
-    public function testRepositoryIndex(): void
+    public function testRepositoryIndexPageDisplaysLinks(): void
     {
         $client   = self::createClient();
         $crawler  = $client->request('GET', '/admin');
         $response = $client->getResponse();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
-        $buttons = $crawler->filterXPath('//a');
-        $this->assertNotEmpty($buttons);
-        $this->assertGreaterThan(3, $buttons->count());
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), 'Admin index page must respond with 200.');
+
+        $links = $crawler->filterXPath('//a');
+        self::assertNotEmpty($links, 'Admin page must contain links.');
+        self::assertGreaterThan(3, $links->count(), 'Expected at least 4 links on the admin index page.');
     }
 
-    public function testRepositoryCRUD(): void
+    public function testRepositoryCRUDWorkflow(): void
     {
         $client = self::createClient();
         $client->disableReboot();
+
+        // --- CREATE NEW REPOSITORY ---
         $crawler  = $client->request('GET', '/admin/new');
         $response = $client->getResponse();
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), 'New repository page must respond with 200.');
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
-        $form = $crawler->filterXPath('//form[@id="new_repository"]');
-        $this->assertSame(Request::METHOD_POST, \mb_strtoupper($form->attr('method')));
+        $form = $crawler->filterXPath('//form[@id="new_repository"]')->form();
+        self::assertSame(Request::METHOD_POST, mb_strtoupper($form->getMethod()), 'Form must use POST method.');
 
-        // form validation must fail due to invalid url
-        $client->submit($form->form());
-        $response = $client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        // Submit invalid form (should fail validation)
+        $client->submit($form);
+        self::assertSame(Response::HTTP_OK, $client->getResponse()->getStatusCode(), 'Invalid form submission should reload page.');
 
-        $url = 'git@github.com:YourAccount/YourRepo.git';
-        $client->submit(
-            $form->form(),
-            [
-                'RepositoryType[type]'               => 'git',
-                'RepositoryType[name]'               => 'lovelyTest',
-                'RepositoryType[url]'                => $url,
-                'RepositoryType[installationSource]' => 'dist',
-            ]
-        );
-        $response = $client->getResponse();
-        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-
-        $this->assertTrue($this->vfsRoot->hasChild('satis.json'));
-        /** @var vfsStreamFile $configHandle */
-        $configHandle = $this->vfsRoot->getChild('satis.json');
-        $config       = $configHandle->getContent();
-
-        $this->assertJson($config);
-        $config = \json_decode($config, false);
-        $this->assertNotEmpty($config);
-
-        self::assertObjectHasProperty('repositories', $config);
-
-        $repositories = \get_object_vars($config->repositories);
-        $this->assertNotEmpty($repositories);
-        $firstRepo = \reset($repositories);
-
-        $this->assertSame($url, $firstRepo->url);
-        $this->assertSame('git', $firstRepo->type);
-        $this->assertSame('dist', $firstRepo->{'installation-source'});
-
-        $url2    = 'git@github.com:account/repository.git';
-        $crawler = $client->request('GET', '/admin/edit/' . \md5($url));
-        $form    = $crawler->filterXPath('//form[@id="edit_repository"]');
-
-        $client->submit(
-            $form->form(),
-            [
-                'RepositoryType[type]'               => 'github',
-                'RepositoryType[url]'                => $url2,
-                'RepositoryType[name]'               => 'lovelyTest2',
-                'RepositoryType[installationSource]' => 'source',
-            ]
-        );
+        // Submit valid form
+        $firstUrl = 'git@github.com:YourAccount/YourRepo.git';
+        $client->submit($form, [
+            'RepositoryType[type]'               => 'git',
+            'RepositoryType[name]'               => 'lovelyTest',
+            'RepositoryType[url]'                => $firstUrl,
+            'RepositoryType[installationSource]' => 'dist',
+        ]);
 
         $response = $client->getResponse();
-        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode(), 'Form submission must redirect.');
 
-        /** @var vfsStreamFile $configHandle */
-        $configHandle = $this->vfsRoot->getChild('satis.json');
-        $config       = \json_decode($configHandle->getContent(), false, 512, \JSON_THROW_ON_ERROR);
+        $this->assertRepositoryInConfig($firstUrl, 'git', 'dist');
 
-        $repositories = \get_object_vars($config->repositories);
-        $this->assertNotEmpty($repositories);
-        $firstRepo = \reset($repositories);
+        // --- EDIT REPOSITORY ---
+        $secondUrl = 'git@github.com:account/repository.git';
+        $crawler   = $client->request('GET', '/admin/edit/' . md5($firstUrl));
+        $editForm  = $crawler->filterXPath('//form[@id="edit_repository"]')->form();
 
-        $this->assertSame($url2, $firstRepo->url);
-        $this->assertSame('github', $firstRepo->type);
-        $this->assertSame('source', $firstRepo->{'installation-source'});
+        $client->submit($editForm, [
+            'RepositoryType[type]'               => 'github',
+            'RepositoryType[url]'                => $secondUrl,
+            'RepositoryType[name]'               => 'lovelyTest2',
+            'RepositoryType[installationSource]' => 'source',
+        ]);
 
-        $client->request('DELETE', '/admin/delete/' . \md5($url2));
         $response = $client->getResponse();
-        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode(), 'Edit submission must redirect.');
+
+        $this->assertRepositoryInConfig($secondUrl, 'github', 'source');
+
+        // --- DELETE REPOSITORY ---
+        $client->request('DELETE', '/admin/delete/' . md5($secondUrl));
+        $response = $client->getResponse();
+        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode(), 'Delete request must redirect.');
+    }
+
+    /**
+     * Helper method to assert repository exists in vfs satis.json
+     */
+    private function assertRepositoryInConfig(string $url, string $type, string $installationSource): void
+    {
+        self::assertTrue($this->vfsRoot->hasChild('satis.json'), 'satis.json must exist in vfsRoot.');
+
+        /** @var vfsStreamFile $configFile */
+        $configFile = $this->vfsRoot->getChild('satis.json');
+        $config     = json_decode($configFile->getContent(), false, 512, JSON_THROW_ON_ERROR);
+
+        self::assertObjectHasProperty('repositories', $config, 'satis.json must contain "repositories".');
+
+        $repositories = get_object_vars($config->repositories);
+        self::assertNotEmpty($repositories, 'There must be at least one repository in the config.');
+
+        $firstRepo = reset($repositories);
+
+        self::assertSame($url, $firstRepo->url, 'Repository URL must match.');
+        self::assertSame($type, $firstRepo->type, 'Repository type must match.');
+        self::assertSame($installationSource, $firstRepo->{'installation-source'}, 'Installation source must match.');
     }
 }

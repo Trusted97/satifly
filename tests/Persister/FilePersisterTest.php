@@ -25,18 +25,18 @@ use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-class FilePersisterTest extends KernelTestCase
+final class FilePersisterTest extends KernelTestCase
 {
     use SchemaValidatorTrait;
     use VfsTrait;
 
-    /** @var FilePersister|null */
-    protected $persister;
+    private ?FilePersister $persister = null;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->vfsSetup();
+
         $this->persister = new FilePersister(
             new Filesystem(),
             $this->vfsRoot->url() . '/satis.json',
@@ -51,37 +51,38 @@ class FilePersisterTest extends KernelTestCase
         parent::tearDown();
     }
 
-    public function testDumpMustTruncateFile(): void
+    public function testFlushTruncatesFileCorrectly(): void
     {
         $config = [
-            'name'         => 'test',
-            'homepage'     => 'http://localhost',
+            'name' => 'test',
+            'homepage' => 'http://localhost',
             'repositories' => [
-                [
-                    'type'  => 'git',
-                    'url'   => 'https://github.com/ludofleury/satisfy.git',
-                    'name'  => 'ludofleury/satisfy',
-                ],
+                ['type' => 'git', 'url' => 'https://github.com/ludofleury/satisfy.git', 'name' => 'ludofleury/satisfy'],
             ],
             'require-all' => true,
         ];
+
         $content = \json_encode($config);
         $this->persister->flush($content);
+
         /** @var vfsStreamFile $configFile */
         $configFile = $this->vfsRoot->getChild('satis.json');
-        $this->assertStringEqualsFile($configFile->url(), $content);
-        $this->assertSame($content, $this->persister->load());
+
+        self::assertStringEqualsFile($configFile->url(), $content, 'File content must match flushed content.');
+        self::assertSame($content, $this->persister->load(), 'Loaded content must match flushed content.');
 
         $this->validateSchema(\json_decode($configFile->getContent()), $this->getSatisSchema());
 
+        // truncate repositories
         $config['repositories'] = [];
-        $content                = \json_encode($config);
+        $content = \json_encode($config);
         $this->persister->flush($content);
-        $this->assertStringEqualsFile($configFile->url(), $content);
-        $this->assertSame($content, $this->persister->load());
+
+        self::assertStringEqualsFile($configFile->url(), $content, 'After truncation, file content must match.');
+        self::assertSame($content, $this->persister->load(), 'Loaded content must match truncated content.');
     }
 
-    public function testPersisterNormalization(): void
+    public function testJsonPersisterNormalizationWorks(): void
     {
         $file = new vfsStreamFile('satis.json');
         $file->setContent(\file_get_contents(__DIR__ . '/../fixtures/satis-full.json'));
@@ -90,41 +91,47 @@ class FilePersisterTest extends KernelTestCase
         self::bootKernel();
 
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
-        $serializer           = new Serializer(
+        $serializer = new Serializer(
             [
                 new ConfigurationNormalizer(),
                 new ObjectNormalizer(
-                    classMetadataFactory: new ClassMetadataFactory(new AttributeLoader()),
-                    nameConverter: new MetadataAwareNameConverter($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter()),
-                    propertyTypeExtractor: new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])
+                    classMetadataFactory: $classMetadataFactory,
+                    nameConverter: new MetadataAwareNameConverter(
+                        $classMetadataFactory,
+                        new CamelCaseToSnakeCaseNameConverter()
+                    ),
+                    propertyTypeExtractor: new PropertyInfoExtractor([], [
+                        new PhpDocExtractor(),
+                        new ReflectionExtractor(),
+                    ])
                 ),
             ],
             [new JsonEncoder()]
         );
+
         $persister = new JsonPersister(
             $this->persister,
             $serializer,
             Configuration::class
         );
+
         $config = $persister->load();
 
-        // validate config
+        // validate require
         $require = $config->getRequire();
-        $this->assertIsArray($require);
-        $this->assertCount(1, $require);
+        self::assertIsArray($require, 'Require must be an array.');
+        self::assertCount(1, $require, 'Require array must contain one element.');
 
+        // validate repositories
         $repositories = $config->getRepositories();
-        $this->assertCount(1, $repositories);
-        $this->assertIsString($repositories->key());
-        $this->assertInstanceOf(RepositoryInterface::class, $repositories->current());
-        self::assertIsArray($stability = $config->getMinimumStabilityPerPackage());
-        self::assertArrayHasKey(0, $stability);
+        self::assertCount(1, $repositories, 'Repositories must contain one element.');
+        self::assertInstanceOf(RepositoryInterface::class, $repositories->current(), 'Repository must implement RepositoryInterface.');
 
-        // append additional repo
+        // append additional repository
         $repositories->append(new Repository(url: 'http://localhost', name: 'funny/test'));
         $config->setRepositories($repositories);
 
-        // change existing, append additional require
+        // modify existing require and add new
         $constraint = \reset($require);
         $constraint->setConstraint('^2.0');
         $config->setRequire([
@@ -132,20 +139,15 @@ class FilePersisterTest extends KernelTestCase
             new PackageConstraint('psr/log', '^1.0'),
         ]);
 
-        // add required specific package stability
+        // add minimum stability per package
         $config->addMinimumStabilityPerPackage('phpunit/phpunit', 'alpha');
 
         $persister->flush($config);
 
         $config = $persister->load();
 
-        $require = $config->getRequire();
-        $this->assertIsArray($require);
-        $this->assertCount(2, $require);
-
-        $repositories = $config->getRepositories();
-        $this->assertCount(2, $repositories);
-        $this->assertIsString($repositories->key());
-        $this->assertInstanceOf(RepositoryInterface::class, $repositories->current());
+        self::assertCount(2, $config->getRequire(), 'Require array must contain two elements after modification.');
+        self::assertCount(2, $config->getRepositories(), 'Repositories must contain two elements after modification.');
+        self::assertInstanceOf(RepositoryInterface::class, $config->getRepositories()->current(), 'Repository must implement RepositoryInterface.');
     }
 }

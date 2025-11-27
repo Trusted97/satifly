@@ -2,59 +2,56 @@
 
 namespace App\Tests\Controller;
 
-use org\bovigo\vfs\vfsStream;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class SecurityControllerTest extends WebTestCase
+final class SecurityControllerTest extends WebTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        vfsStream::setup();
-    }
-
-    public function testAdminLogin(): void
+    public function testAdminLoginFlow(): void
     {
         $client = self::createClient(['environment' => 'testsecure']);
 
-        // must redirect to login form
+        // --- REDIRECT TO LOGIN ---
         $client->request(Request::METHOD_GET, '/admin');
         $response = $client->getResponse();
-        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        $this->assertStringEndsWith('/login', $response->headers->get('location'));
 
+        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode(), 'Accessing /admin without login must redirect.');
+        self::assertStringEndsWith('/login', $response->headers->get('location'), 'Redirect must go to /login.');
+
+        // --- LOGIN FORM DISPLAY ---
         $crawler  = $client->request(Request::METHOD_GET, '/login');
         $response = $client->getResponse();
-        $this->assertTrue($response->isSuccessful());
+        self::assertTrue($response->isSuccessful(), 'Login page must respond with 200.');
 
-        // submit empty form
         $form = $crawler->filterXPath('//form[@id="login_form"]')->form();
-        $client->submit(
-            $form,
-            [
-                'login[username]' => 'test',
-                'login[password]' => '',
-            ]
-        );
-        /** @var RedirectResponse $response */
-        $response = $client->getResponse();
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertTrue($response->isRedirection());
-        $this->assertStringEndsWith('/login', $response->getTargetUrl());
 
-        $client->submit($form, ['login[username]' => 'test', 'login[password]' => 'test']);
-        /** @var RedirectResponse $response */
-        $response = $client->getResponse();
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertTrue($response->isRedirection());
-        $this->assertStringEndsWith('/admin', $response->getTargetUrl());
+        // --- SUBMIT EMPTY PASSWORD ---
+        $client->submit($form, [
+            'login[username]' => 'test',
+            'login[password]' => '',
+        ]);
 
-        // authenticated and able to see admin section
+        $response = $client->getResponse();
+        self::assertInstanceOf(RedirectResponse::class, $response, 'Invalid login submission must redirect.');
+        self::assertTrue($response->isRedirection(), 'Response must be a redirection.');
+        self::assertStringEndsWith('/login', $response->getTargetUrl(), 'Failed login must redirect back to /login.');
+
+        // --- SUBMIT CORRECT CREDENTIALS ---
+        $client->submit($form, [
+            'login[username]' => 'test',
+            'login[password]' => 'test',
+        ]);
+
+        $response = $client->getResponse();
+        self::assertInstanceOf(RedirectResponse::class, $response, 'Successful login must redirect.');
+        self::assertTrue($response->isRedirection(), 'Response must be a redirection.');
+        self::assertStringEndsWith('/admin', $response->getTargetUrl(), 'Successful login must redirect to /admin.');
+
+        // --- ACCESS ADMIN AFTER LOGIN ---
         $client->request(Request::METHOD_GET, '/admin');
         $response = $client->getResponse();
-        $this->assertTrue($response->isSuccessful());
+        self::assertTrue($response->isSuccessful(), 'Authenticated user must be able to access /admin.');
     }
 }

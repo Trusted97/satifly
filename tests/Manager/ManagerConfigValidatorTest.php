@@ -8,23 +8,24 @@ use App\Service\RepositoryManager;
 use App\Tests\Traits\SchemaValidatorTrait;
 use App\Tests\Traits\VfsTrait;
 use org\bovigo\vfs\vfsStreamFile;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 
-class ManagerConfigValidatorTest extends TestCase
+final class ManagerConfigValidatorTest extends TestCase
 {
     use ProphecyTrait;
     use SchemaValidatorTrait;
     use VfsTrait;
 
-    /** @var vfsStreamFile */
-    protected $config;
+    private vfsStreamFile $config;
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->vfsSetup();
         $this->vfsRoot->addChild($this->config = new vfsStreamFile('satis.json'));
     }
@@ -32,29 +33,38 @@ class ManagerConfigValidatorTest extends TestCase
     protected function tearDown(): void
     {
         $this->vfsTearDown();
+        parent::tearDown();
     }
 
-    /**
-     * @dataProvider configFileProvider
-     */
-    public function testConfigIsMatchingSatisSchema($configFilename): void
+    #[DataProvider(methodName: 'configFileProvider')]
+    public function testConfigIsMatchingSatisSchema(string $configFilePath): void
     {
-        $this->assertTrue(\copy($configFilename, $this->config->url()));
-        $persister = $this->prophesize(JsonPersister::class);
-        $persister
-            ->load()
-            ->willReturn(new Configuration());
-        $persister
-            ->flush(Argument::type(Configuration::class))
-            ->shouldBeCalled();
+        // copy fixture into vfs
+        $copied = \copy($configFilePath, $this->config->url());
+        self::assertTrue($copied, 'Fixture file must be copied into virtual filesystem.');
 
+        // create a Prophecy for JsonPersister
+        $persister = $this->prophesize(JsonPersister::class);
+        $persister->load()->willReturn(new Configuration())->shouldBeCalled();
+        $persister->flush(Argument::type(Configuration::class))->shouldBeCalled();
+
+        // instantiate RepositoryManager with LockFactory and persister mock
         $lockFactory = new LockFactory(new FlockStore());
-        /** @var RepositoryManager $manager */
         $manager = new RepositoryManager($lockFactory, $persister->reveal());
+
+        // call addAll to simulate repository addition
         $manager->addAll([]);
 
-        $this->validateSchema(\json_decode($this->config->getContent()), $this->getSatisSchema());
-        $this->assertJsonFileEqualsJsonFile($configFilename, $this->config->url());
+        // validate JSON against Satis schema
+        $decodedConfig = \json_decode($this->config->getContent());
+        $this->validateSchema($decodedConfig, $this->getSatisSchema());
+
+        // assert virtual file still matches fixture
+        self::assertJsonFileEqualsJsonFile(
+            $configFilePath,
+            $this->config->url(),
+            'Generated JSON must match fixture.'
+        );
     }
 
     public static function configFileProvider(): array
