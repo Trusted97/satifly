@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Integration\Composer\Satis\Command;
+namespace App\Tests\Integration;
 
 use App\DTO\Archive;
 use App\DTO\Configuration;

@@ -9,38 +9,38 @@ class Configuration
 {
     public const string DEFAULT_OUTPUT_DIR = 'public';
 
-    private string $name        = 'localhost/repository';
-    private string $description = '';
-    private string $homepage    = 'http://localhost';
+    public string $name        = 'localhost/repository';
+    public string $description = '';
+    public string $homepage    = 'http://localhost';
 
     #[SerializedName('output-dir')]
-    private string $outputDir = self::DEFAULT_OUTPUT_DIR;
+    public string $outputDir = self::DEFAULT_OUTPUT_DIR;
 
     #[SerializedName('output-html')]
-    private bool $outputHtml = true;
+    public bool $outputHtml = true;
 
     /**
      * @var \ArrayObject<string, RepositoryInterface>|RepositoryInterface[]
      */
-    private \ArrayIterator|array $repositories;
+    public \ArrayIterator|array $repositories;
 
     /**
      * @var PackageConstraint[]
      */
     #[SerializedName('require')]
-    private array $require = [];
+    public array $require = [];
 
     #[SerializedName('require-all')]
-    private bool $requireAll = false;
+    public bool $requireAll = false;
 
     #[SerializedName('require-dependencies')]
-    private bool $requireDependencies = false;
+    public bool $requireDependencies = false;
 
     #[SerializedName('require-dev-dependencies')]
-    private bool $requireDevDependencies = false;
+    public bool $requireDevDependencies = false;
 
     #[SerializedName('require-dependency-filter')]
-    private bool $requireDependencyFilter = true;
+    public bool $requireDependencyFilter = true;
 
     /**
      * @var string[]|null
@@ -49,51 +49,51 @@ class Configuration
     private ?array $stripHosts = null;
 
     #[SerializedName('include-filename')]
-    private ?string $includeFilename = null;
+    public ?string $includeFilename = null;
 
     #[SerializedName('archive')]
-    private ?Archive $archive = null;
+    public ?Archive $archive = null;
 
     #[SerializedName('minimum-stability')]
-    private ?string $minimumStability = 'dev';
+    public ?string $minimumStability = 'dev';
 
     /**
      * @var PackageStability[]
      */
     #[SerializedName('minimum-stability-per-package')]
-    private array $minimumStabilityPerPackage = [];
+    public array $minimumStabilityPerPackage = [];
 
-    private bool $providers = false;
+    public bool $providers = false;
 
     #[SerializedName('providers-history-size')]
     private ?int $providersHistorySize = null;
 
     #[SerializedName('twig-template')]
-    private ?string $twigTemplate = null;
+    public ?string $twigTemplate = null;
 
     /**
      * @var Abandoned[]
      */
-    private array $abandoned = [];
+    public array $abandoned = [];
 
     /**
      * @var PackageConstraint[]
      */
-    private array $blacklist = [];
+    public array $blacklist = [];
 
     /**
      * @var mixed[]|null
      */
-    private ?array $config = null;
+    public ?array $config = null;
 
     #[SerializedName('notify-batch')]
-    private ?string $notifyBatch = null;
+    public ?string $notifyBatch = null;
 
     #[SerializedName('_comment')]
     private ?string $comment = null;
 
     #[SerializedName('pretty-print')]
-    private bool $prettyPrint = true;
+    public bool $prettyPrint = true;
 
     public function __construct()
     {
