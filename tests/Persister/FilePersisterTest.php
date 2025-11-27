@@ -54,8 +54,8 @@ final class FilePersisterTest extends KernelTestCase
     public function testFlushTruncatesFileCorrectly(): void
     {
         $config = [
-            'name' => 'test',
-            'homepage' => 'http://localhost',
+            'name'         => 'test',
+            'homepage'     => 'http://localhost',
             'repositories' => [
                 ['type' => 'git', 'url' => 'https://github.com/ludofleury/satisfy.git', 'name' => 'ludofleury/satisfy'],
             ],
@@ -75,7 +75,7 @@ final class FilePersisterTest extends KernelTestCase
 
         // truncate repositories
         $config['repositories'] = [];
-        $content = \json_encode($config);
+        $content                = \json_encode($config);
         $this->persister->flush($content);
 
         self::assertStringEqualsFile($configFile->url(), $content, 'After truncation, file content must match.');
@@ -91,7 +91,7 @@ final class FilePersisterTest extends KernelTestCase
         self::bootKernel();
 
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
-        $serializer = new Serializer(
+        $serializer           = new Serializer(
             [
                 new ConfigurationNormalizer(),
                 new ObjectNormalizer(

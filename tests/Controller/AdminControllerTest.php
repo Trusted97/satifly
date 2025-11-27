@@ -48,7 +48,7 @@ final class AdminControllerTest extends WebTestCase
         self::assertSame(Response::HTTP_OK, $response->getStatusCode(), 'New repository page must respond with 200.');
 
         $form = $crawler->filterXPath('//form[@id="new_repository"]')->form();
-        self::assertSame(Request::METHOD_POST, mb_strtoupper($form->getMethod()), 'Form must use POST method.');
+        self::assertSame(Request::METHOD_POST, \mb_strtoupper($form->getMethod()), 'Form must use POST method.');
 
         // Submit invalid form (should fail validation)
         $client->submit($form);
@@ -70,7 +70,7 @@ final class AdminControllerTest extends WebTestCase
 
         // --- EDIT REPOSITORY ---
         $secondUrl = 'git@github.com:account/repository.git';
-        $crawler   = $client->request('GET', '/admin/edit/' . md5($firstUrl));
+        $crawler   = $client->request('GET', '/admin/edit/' . \md5($firstUrl));
         $editForm  = $crawler->filterXPath('//form[@id="edit_repository"]')->form();
 
         $client->submit($editForm, [
@@ -86,7 +86,7 @@ final class AdminControllerTest extends WebTestCase
         $this->assertRepositoryInConfig($secondUrl, 'github', 'source');
 
         // --- DELETE REPOSITORY ---
-        $client->request('DELETE', '/admin/delete/' . md5($secondUrl));
+        $client->request('DELETE', '/admin/delete/' . \md5($secondUrl));
         $response = $client->getResponse();
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode(), 'Delete request must redirect.');
     }
@@ -100,14 +100,14 @@ final class AdminControllerTest extends WebTestCase
 
         /** @var vfsStreamFile $configFile */
         $configFile = $this->vfsRoot->getChild('satis.json');
-        $config     = json_decode($configFile->getContent(), false, 512, JSON_THROW_ON_ERROR);
+        $config     = \json_decode($configFile->getContent(), false, 512, \JSON_THROW_ON_ERROR);
 
         self::assertObjectHasProperty('repositories', $config, 'satis.json must contain "repositories".');
 
-        $repositories = get_object_vars($config->repositories);
+        $repositories = \get_object_vars($config->repositories);
         self::assertNotEmpty($repositories, 'There must be at least one repository in the config.');
 
-        $firstRepo = reset($repositories);
+        $firstRepo = \reset($repositories);
 
         self::assertSame($url, $firstRepo->url, 'Repository URL must match.');
         self::assertSame($type, $firstRepo->type, 'Repository type must match.');

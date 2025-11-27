@@ -50,7 +50,7 @@ final class ManagerConfigValidatorTest extends TestCase
 
         // instantiate RepositoryManager with LockFactory and persister mock
         $lockFactory = new LockFactory(new FlockStore());
-        $manager = new RepositoryManager($lockFactory, $persister->reveal());
+        $manager     = new RepositoryManager($lockFactory, $persister->reveal());
 
         // call addAll to simulate repository addition
         $manager->addAll([]);
