@@ -1266,8 +1266,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 final class App
 {
     /**
-     * @param ConfigType $config
+     * Provides the application's service and extension configuration.
      *
+     * @param ConfigType $config The configuration structure for the application (see `ConfigType` psalm type aliases defined above).
      * @psalm-return ConfigType
      */
     public static function config(array $config): array
@@ -1344,8 +1345,11 @@ namespace Symfony\Component\Routing\Loader\Configurator;
 final class Routes
 {
     /**
-     * @param RoutesConfig $config
+     * Builds and returns a routes configuration array for the application.
      *
+     * The configuration may contain RouteConfig, ImportConfig, or AliasConfig entries and may use environment-scoped keys (e.g. "when@dev").
+     *
+     * @param RoutesConfig $config
      * @psalm-return RoutesConfig
      */
     public static function config(array $config): array
