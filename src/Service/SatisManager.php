@@ -11,7 +11,7 @@ use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 #[AsEventListener(event: BuildEvent::class, method: 'onBuild', priority: 100)]
-final class SatisManager
+class SatisManager
 {
     protected string $satisFilename;
 
@@ -80,6 +80,9 @@ final class SatisManager
         $event->setStatus($status);
     }
 
+    /**
+     * @throws \JsonException
+     */
     protected function getCommandLine(?string $repositoryName = null, array $options = [], array $extraArgs = []): array
     {
         $configuration = $this->manager->getConfig();
@@ -99,7 +102,7 @@ final class SatisManager
             $satisCommandBuilder->withRepository($repositoryName);
         }
 
-        $this->logger->info(\json_encode($satisCommandBuilder->build()));
+        $this->logger->info(\json_encode($satisCommandBuilder->build(), \JSON_THROW_ON_ERROR));
 
         return $satisCommandBuilder->build();
     }
