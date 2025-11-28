@@ -69,9 +69,11 @@ class SatisManager
      * and updates the event's status with the process exit code (`1` if an internal
      * RuntimeException occurs).
      *
-     * @param BuildEvent $event The build event; its repository (if any) is used to
+     * @param BuildEvent $event the build event; its repository (if any) is used to
      *                          determine the build target and its status will be
-     *                          updated with the process exit code.
+     *                          updated with the process exit code
+     *
+     * @throws \JsonException
      */
     public function onBuild(BuildEvent $event): void
     {
@@ -97,11 +99,13 @@ class SatisManager
      * Constructs a command array based on the configured satis file and output directory,
      * optionally scoping the build to a single repository and adding extra options or arguments.
      *
-     * @param string|null $repositoryName Name of a single repository to target, or `null` to include all repositories.
-     * @param array $options Associative or list-style Satis options to include (added via the builder's options API).
-     * @param array $extraArgs Additional positional arguments to append to the command.
-     * @return array The constructed command as an array of command and arguments suitable for Process execution.
-     * @throws \JsonException If encoding the built command to JSON for logging fails.
+     * @param string|null $repositoryName name of a single repository to target, or `null` to include all repositories
+     * @param array       $options        associative or list-style Satis options to include (added via the builder's options API)
+     * @param array       $extraArgs      additional positional arguments to append to the command
+     *
+     * @throws \JsonException if encoding the built command to JSON for logging fails
+     *
+     * @return array the constructed command as an array of command and arguments suitable for Process execution
      */
     protected function getCommandLine(?string $repositoryName = null, array $options = [], array $extraArgs = []): array
     {

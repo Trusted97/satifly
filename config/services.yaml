@@ -51,10 +51,15 @@ services:
         tags:
             - { name: serializer.normalizer, priority: 1000 }
 
+    App\Process\EnvironmentProvider:
+        arguments:
+            $composerHome: "%composer.home%"
+
+
     App\Process\ProcessFactory:
         arguments:
             $rootPath: "%kernel.project_dir%"
-            $composerHome: "%composer.home%"
+            $envProvider: '@App\Process\EnvironmentProvider'
 
     App\Service\SatisManager:
         public: true

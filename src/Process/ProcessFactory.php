@@ -8,8 +8,9 @@ final readonly class ProcessFactory
 {
     public function __construct(
         private string $rootPath,
-        private EnvironmentProvider $envProvider
-    ) {}
+        private EnvironmentProvider $envProvider,
+    ) {
+    }
 
     public function create(array $command, ?int $timeout = null): Process
     {

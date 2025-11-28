@@ -2,10 +2,10 @@
 
 namespace App\Process;
 
-final readonly class EnvironmentProvider
+class EnvironmentProvider
 {
     public function __construct(
-        private string $composerHome,
+        private readonly string $composerHome,
     ) {
     }
 
