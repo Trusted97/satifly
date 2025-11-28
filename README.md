@@ -2,7 +2,7 @@
 
 ![CI Status](https://github.com/Trusted97/satifly/actions/workflows/ci.yaml/badge.svg)
 ![PHP Version](https://img.shields.io/badge/PHP-8.4-blue?style=flat)
-![Symfony Version](https://img.shields.io/badge/Symfony-7.3-green?style=flat)
+![Symfony Version](https://img.shields.io/badge/Symfony-7.4-green?style=flat)
 [![Maintainability](https://qlty.sh/badges/a2bd8d7e-c9c0-48bf-b681-eeb3576bbe35/maintainability.svg)](https://qlty.sh/gh/Trusted97/projects/satifly)
 
 **Satifly** is the easiest and fastest way to host and manage your private Composer packages. Built for modern PHP developers, it combines the power of [Satis](https://getcomposer.org/doc/articles/handling-private-packages-with-satis.md) with the performance of [FrankenPHP](https://frankenphp.dev) and the reliability of [Caddy](https://caddyserver.com/) — all wrapped in a clean, production-ready Docker environment.
