@@ -109,7 +109,7 @@ make satis-build
 ## ⚡ Core Advantages
 
 *   ✅ **Production-grade by design** — secure, scalable, and battle-tested
-*   🐘 **Built with Symfony 6.4 & PHP 8.4** — modern, reliable foundation
+*   🐘 **Built with Symfony 7.4 & PHP 8.4** — modern, reliable foundation
 *   🚀 **FrankenPHP worker mode** — ultra-fast and memory efficient
 *   🔒 **Automatic HTTPS** with Caddy
 *   🧩 **Extensible architecture** — customize for your organization
