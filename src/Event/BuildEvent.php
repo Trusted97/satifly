@@ -5,7 +5,7 @@ namespace App\Event;
 use App\DTO\RepositoryInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class BuildEvent extends Event
+class BuildEvent extends Event
 {
     public const string NAME = 'satis_build';
 
