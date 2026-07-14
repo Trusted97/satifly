@@ -7,8 +7,6 @@
 
 **Satifly** is the easiest and fastest way to host and manage your private Composer packages. Built for modern PHP developers, it combines the power of [Satis](https://getcomposer.org/doc/articles/handling-private-packages-with-satis.md) with the performance of [FrankenPHP](https://frankenphp.dev) and the reliability of [Caddy](https://caddyserver.com/) - all wrapped in a clean, production-ready Docker environment.
 
-![Satifly Dashboard Screenshot](docs/images/dashboard-overview.png)
-
 - - -
 
 ## 💡 Why Satifly?
