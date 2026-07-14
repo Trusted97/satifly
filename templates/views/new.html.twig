@@ -13,7 +13,9 @@
 
     <div class="card shadow-sm my-4">
         <div class="card-header bg-light d-flex align-items-center">
-            <i class="bi bi-plus-circle text-primary me-2"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-primary me-2" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+            </svg>
             <h5 class="mb-0">Register a New Repository</h5>
         </div>
 
@@ -45,7 +47,7 @@
 
             <div class="d-grid mt-4">
                 <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="bi bi-check-circle me-2"></i>Register Repository
+                    Register Repository
                 </button>
             </div>
             {{ form_end(form) }}

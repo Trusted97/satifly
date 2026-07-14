@@ -6,8 +6,7 @@ use App\DTO\Configuration;
 use App\Persister\JsonPersister;
 use App\Service\RepositoryManager;
 use App\Tests\Traits\SchemaValidatorTrait;
-use App\Tests\Traits\VfsTrait;
-use org\bovigo\vfs\vfsStreamFile;
+use App\Tests\Traits\TempFilesystemTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -19,28 +18,27 @@ final class ManagerConfigValidatorTest extends TestCase
 {
     use ProphecyTrait;
     use SchemaValidatorTrait;
-    use VfsTrait;
+    use TempFilesystemTrait;
 
-    private vfsStreamFile $config;
+    private string $configFile;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->vfsSetup();
-        $this->vfsRoot->addChild($this->config = new vfsStreamFile('satis.json'));
+        $this->tempSetup('satifly-manager');
+        $this->configFile = $this->tempPath('satis.json');
     }
 
     protected function tearDown(): void
     {
-        $this->vfsTearDown();
+        $this->tempTearDown();
         parent::tearDown();
     }
 
     #[DataProvider(methodName: 'configFileProvider')]
     public function testConfigIsMatchingSatisSchema(string $configFilePath): void
     {
-        // copy fixture into vfs
-        $copied = \copy($configFilePath, $this->config->url());
+        $copied = \copy($configFilePath, $this->configFile);
         self::assertTrue($copied, 'Fixture file must be copied into virtual filesystem.');
 
         // create a Prophecy for JsonPersister
@@ -56,13 +54,13 @@ final class ManagerConfigValidatorTest extends TestCase
         $manager->addAll([]);
 
         // validate JSON against Satis schema
-        $decodedConfig = \json_decode($this->config->getContent());
+        $decodedConfig = \json_decode((string) \file_get_contents($this->configFile));
         $this->validateSchema($decodedConfig, $this->getSatisSchema());
 
-        // assert virtual file still matches fixture
+        // assert file still matches fixture
         self::assertJsonFileEqualsJsonFile(
             $configFilePath,
-            $this->config->url(),
+            $this->configFile,
             'Generated JSON must match fixture.'
         );
     }

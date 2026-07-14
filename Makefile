@@ -85,7 +85,7 @@ satis-build: ## Build satis packages
 # -------------------------------------------
 
 permissions: ## Fix file permissions for storage and cache
-	$(COMPOSE) exec $(PHP_CONTAINER) chown -R www-data:www-data /var/www/html/var /var/www/html/public
+	$(COMPOSE) exec $(PHP_CONTAINER) chown -R www-data:www-data /app/var /app/public
 
 env-check: ## Ensure .env file exists
 	@if [ ! -f $(ENV_FILE) ]; then \
@@ -120,6 +120,29 @@ xdebug-off: ## Disable Xdebug in the PHP container
 	$(COMPOSE) exec $(PHP_CONTAINER) bash -c "rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
 	$(COMPOSE) restart $(PHP_CONTAINER)
 	@echo "$(GREEN)✔ Xdebug disabled!$(RESET)"
+
+xdebug-connect: xdebug-on ## Enable Xdebug and trigger PhpStorm debugger
+	@echo "$(CYAN)🌐 Sending test request to trigger Xdebug...$(RESET)"
+	@curl -s -o /dev/null "http://localhost" -H "XDEBUG_SESSION=PHPSTORM"
+	@echo "$(GREEN)✔ Test request sent. Make sure PhpStorm is listening for debug connections!$(RESET)"
+
+xdebug-help: ## Show PhpStorm + Docker + Xdebug configuration instructions
+	@echo "$(CYAN)🛠️ PhpStorm + Docker + Xdebug Setup Instructions$(RESET)"
+	@echo "1. Open PhpStorm Settings: press ⌘ Cmd + 0 (macOS) or File → Settings (Windows/Linux) → PHP."
+	@echo "2. On the PHP page, click the Browse button next to the CLI Interpreter list."
+	@echo "3. In the CLI Interpreters dialog, click the '+' button → choose 'From Docker, Vagrant, VM, WSL, Remote...'."
+	@echo "4. In the 'Configure Remote PHP Interpreter' dialog, select the Docker method."
+	@echo "5. Provide the Docker connection parameters:"
+	@echo "     • Server: select your Docker configuration, or click 'New...' to add one."
+	@echo "     • Image name: specify the base PHP image, e.g., php:latest or php:8.2-cli."
+	@echo "     • PHP interpreter path: PhpStorm usually suggests /usr/local/bin/php inside the container."
+	@echo "6. Click OK: PhpStorm checks if the PHP executable exists inside the container."
+	@echo "     • If found, the CLI Interpreters dialog will show the installation folder and PHP version."
+	@echo "     • Click 'Show phpinfo' to see loaded extensions and configured options."
+	@echo "7. Make sure Xdebug is installed in your container (use 'make xdebug-on')."
+	@echo "8. In PhpStorm toolbar, click the phone icon to 'Start Listening for PHP Debug Connections'."
+	@echo "9. Configure path mappings: map your local project folder → remote folder inside the container (e.g., /var/www/html)."
+	@echo "10. Trigger a debug session using 'make xdebug-connect' or by appending ?XDEBUG_SESSION=PHPSTORM to your URL."
 
 # -------------------------------------------
 # 🚀 Shortcuts

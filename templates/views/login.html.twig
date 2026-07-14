@@ -5,38 +5,50 @@
 {% block header %}{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h3 class="card-title text-center mb-4">Satifly 🐘 - Login</h3>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-7 col-xl-5">
+            <div class="card border-0 overflow-hidden">
+                <div class="card-body p-4 p-lg-5">
+                    <div class="text-center mb-4">
+                        <span class="badge rounded-pill text-bg-primary px-3 py-2 mb-3">Satifly</span>
+                        <h2 class="h3 fw-semibold mb-2">Sign in to the admin area</h2>
+                        <p class="text-muted mb-0">Manage repositories, configuration, and build workflows from one secure dashboard.</p>
+                    </div>
 
-                        {# Symfony form start #}
-                        {{ form_start(form, {'attr': {'id': 'login_form'}}) }}
+                    {% if error %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </div>
+                    {% endif %}
 
-                        {# Username field #}
+                    {{ form_start(form, {'attr': {'id': 'login_form'}}) }}
                         <div class="mb-3">
-                            {{ form_label(form.username, 'Username', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(form.username, {'attr': {'class': 'form-control', 'placeholder': 'Enter your username'}}) }}
+                            {{ form_label(form.username, 'Username', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.username, {
+                                'attr': {
+                                    'class': 'form-control form-control-lg',
+                                    'placeholder': 'admin'
+                                },
+                                'value': username
+                            }) }}
                             {{ form_errors(form.username) }}
                         </div>
 
-                        {# Password field #}
-                        <div class="mb-3">
-                            {{ form_label(form.password, 'Password', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(form.password, {'attr': {'class': 'form-control', 'placeholder': 'Enter your password'}}) }}
+                        <div class="mb-4">
+                            {{ form_label(form.password, 'Password', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.password, {
+                                'attr': {
+                                    'class': 'form-control form-control-lg',
+                                    'placeholder': 'Your password'
+                                }
+                            }) }}
                             {{ form_errors(form.password) }}
                         </div>
 
-                        {# Submit button #}
                         <div class="d-grid">
-                            {{ form_widget(form.login, {'attr': {'class': 'btn btn-primary'}}) }}
+                            {{ form_widget(form.login, {'attr': {'class': 'btn btn-primary btn-lg'}}) }}
                         </div>
-
-                        {{ form_end(form) }}
-
-                    </div>
+                    {{ form_end(form) }}
                 </div>
             </div>
         </div>

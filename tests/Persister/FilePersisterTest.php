@@ -10,14 +10,14 @@ use App\Persister\ConfigurationNormalizer;
 use App\Persister\FilePersister;
 use App\Persister\JsonPersister;
 use App\Tests\Traits\SchemaValidatorTrait;
-use App\Tests\Traits\VfsTrait;
-use org\bovigo\vfs\vfsStreamFile;
+use App\Tests\Traits\TempFilesystemTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -28,25 +28,26 @@ use Symfony\Component\Serializer\Serializer;
 final class FilePersisterTest extends KernelTestCase
 {
     use SchemaValidatorTrait;
-    use VfsTrait;
+    use TempFilesystemTrait;
 
     private ?FilePersister $persister = null;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->vfsSetup();
+        $this->tempSetup('satifly-persister');
+        $this->configureSatisTestEnv();
 
         $this->persister = new FilePersister(
             new Filesystem(),
-            $this->vfsRoot->url() . '/satis.json',
-            $this->vfsRoot->url()
+            $this->tempPath('satis.json'),
+            $this->tempPath('satis')
         );
     }
 
     protected function tearDown(): void
     {
-        $this->vfsTearDown();
+        $this->tempTearDown();
         $this->persister = null;
         parent::tearDown();
     }
@@ -65,28 +66,28 @@ final class FilePersisterTest extends KernelTestCase
         $content = \json_encode($config);
         $this->persister->flush($content);
 
-        /** @var vfsStreamFile $configFile */
-        $configFile = $this->vfsRoot->getChild('satis.json');
+        $configFile = $this->tempPath('satis.json');
 
-        self::assertStringEqualsFile($configFile->url(), $content, 'File content must match flushed content.');
+        self::assertStringEqualsFile($configFile, $content, 'File content must match flushed content.');
         self::assertSame($content, $this->persister->load(), 'Loaded content must match flushed content.');
 
-        $this->validateSchema(\json_decode($configFile->getContent()), $this->getSatisSchema());
+        $this->validateSchema(\json_decode((string) \file_get_contents($configFile)), $this->getSatisSchema());
 
         // truncate repositories
         $config['repositories'] = [];
         $content                = \json_encode($config);
         $this->persister->flush($content);
 
-        self::assertStringEqualsFile($configFile->url(), $content, 'After truncation, file content must match.');
+        self::assertStringEqualsFile($configFile, $content, 'After truncation, file content must match.');
         self::assertSame($content, $this->persister->load(), 'Loaded content must match truncated content.');
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     public function testJsonPersisterNormalizationWorks(): void
     {
-        $file = new vfsStreamFile('satis.json');
-        $file->setContent(\file_get_contents(__DIR__ . '/../fixtures/satis-full.json'));
-        $this->vfsRoot->addChild($file);
+        $this->writeTempFile('satis.json', (string) \file_get_contents(__DIR__ . '/../fixtures/satis-full.json'));
 
         self::bootKernel();
 

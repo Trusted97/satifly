@@ -6,14 +6,32 @@ use App\Exception\MissingConfigException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * Persists configuration data to a file.
+ *
+ * Handles reading, writing, backup creation, and permission checks.
+ */
 class FilePersister implements PersisterInterface
 {
     private Filesystem $filesystem;
 
+    /**
+     * Path to the Satis configuration file.
+     */
     private string $filename;
 
+    /**
+     * Directory path where backups/logs are stored.
+     */
     private string $logPath;
 
+    /**
+     * Constructor.
+     *
+     * @param Filesystem $filesystem Filesystem service
+     * @param string     $filename   Path to configuration file
+     * @param string     $logPath    Path to store backups
+     */
     public function __construct(Filesystem $filesystem, string $filename, string $logPath)
     {
         $this->filesystem = $filesystem;
@@ -22,7 +40,7 @@ class FilePersister implements PersisterInterface
     }
 
     /**
-     * Load content from file
+     * Load content from the configuration file.
      *
      * @throws MissingConfigException When config file is missing or empty
      */
@@ -46,17 +64,18 @@ class FilePersister implements PersisterInterface
     }
 
     /**
-     * Flush content to file
+     * Persist content to the configuration file.
      *
-     * @param string $content
+     * Creates a backup before writing and checks permissions.
      *
-     * @throws \RuntimeException
+     * @throws \RuntimeException On write failure
      */
-    public function flush($content): void
+    public function flush(object|string $content): void
     {
         try {
             $this->checkPermissions();
             $this->createBackup();
+
             if (false === @\file_put_contents($this->filename, $content)) {
                 throw new IOException(\sprintf('Failed to write file "%s".', $this->filename), 0, null, $this->filename);
             }
@@ -66,13 +85,14 @@ class FilePersister implements PersisterInterface
     }
 
     /**
-     * Create backup file for current configuration.
+     * Create a timestamped backup of the current configuration file.
      */
     public function createBackup(): void
     {
         if (!\file_exists($this->filename)) {
             return;
         }
+
         if (!$this->filesystem->exists($this->logPath) || !\is_writable($this->logPath)) {
             return;
         }
@@ -83,9 +103,9 @@ class FilePersister implements PersisterInterface
     }
 
     /**
-     * Checks write permission on all needed paths.
+     * Check write permissions for the configuration file and its directory.
      *
-     * @throws IOException
+     * @throws IOException When file or directory is not writable
      */
     protected function checkPermissions(): void
     {
@@ -93,10 +113,8 @@ class FilePersister implements PersisterInterface
             if (!\is_writable($this->filename)) {
                 throw new IOException(\sprintf('File "%s" is not writable.', $this->filename));
             }
-        } else {
-            if (!\is_writable(\dirname($this->filename))) {
-                throw new IOException(\sprintf('Path "%s" is not writable.', \dirname($this->filename)));
-            }
+        } elseif (!\is_writable(\dirname($this->filename))) {
+            throw new IOException(\sprintf('Path "%s" is not writable.', \dirname($this->filename)));
         }
     }
 }

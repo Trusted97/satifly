@@ -8,9 +8,6 @@ use App\Persister\ConfigurationNormalizer;
 use App\Persister\FilePersister;
 use App\Persister\JsonPersister;
 use Composer\Satis\Console\Application;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamDirectory;
-use org\bovigo\vfs\vfsStreamFile;
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -29,23 +26,24 @@ use Symfony\Component\Serializer\Serializer;
 
 final class BuildCommandTest extends KernelTestCase
 {
-    private ?vfsStreamDirectory $vfsRoot = null;
+    use \App\Tests\Traits\TempFilesystemTrait;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->vfsRoot = vfsStream::setup();
+        $this->tempSetup('satifly-build');
+        $this->configureSatisTestEnv();
     }
 
     protected function tearDown(): void
     {
-        $this->vfsRoot = null;
+        $this->tempTearDown();
         parent::tearDown();
     }
 
     public function testBuildFailsWhenConfigIsMissing(): void
     {
-        $configFile  = $this->vfsRoot->url() . '/satis.json';
+        $configFile  = $this->tempPath('satis.json');
         $input       = $this->createInput($configFile);
         $output      = $this->createOutput();
         $application = $this->createSatisApplication();
@@ -62,38 +60,33 @@ final class BuildCommandTest extends KernelTestCase
 
     public function testBuildWithMinimalConfigSucceeds(): void
     {
-        $configFile = new vfsStreamFile('satis.json');
-        $configFile->setContent(\file_get_contents(__DIR__ . '/../fixtures/satis-minimal.json'));
-        $this->vfsRoot->addChild($configFile);
+        $configFile = $this->writeTempFile('satis.json', (string) \file_get_contents(__DIR__ . '/../fixtures/satis-minimal.json'));
 
-        $outputDir = new vfsStreamDirectory('output');
-        $this->vfsRoot->addChild($outputDir);
+        $outputDir = $this->tempPath('output');
+        (new Filesystem())->mkdir($outputDir);
 
-        $input       = $this->createInput($configFile->url(), $outputDir->url());
+        $input       = $this->createInput($configFile, $outputDir);
         $output      = $this->createOutput();
         $application = $this->createSatisApplication();
 
         $exitCode = $application->run($input, $output);
 
         self::assertSame(0, $exitCode, 'Expected exit code 0 for minimal config build.');
-        self::assertTrue($outputDir->hasChild('index.html'), 'index.html must be generated.');
-        self::assertTrue($outputDir->hasChild('packages.json'), 'packages.json must be generated.');
-        self::assertTrue($outputDir->hasChild('include'), 'include directory must exist.');
+        self::assertFileExists($outputDir . '/index.html', 'index.html must be generated.');
+        self::assertFileExists($outputDir . '/packages.json', 'packages.json must be generated.');
+        self::assertDirectoryExists($outputDir . '/include', 'include directory must exist.');
 
-        /** @var vfsStreamDirectory $includeDir */
-        $includeDir = $outputDir->getChild('include');
-        self::assertTrue($includeDir->hasChildren(), 'include directory must contain files.');
+        self::assertNotEmpty(\glob($outputDir . '/include/*') ?: [], 'include directory must contain files.');
     }
 
     public function testBuildWithDefaultFormConfigSucceeds(): void
     {
-        $configFile = new vfsStreamFile('satis.json');
-        $this->vfsRoot->addChild($configFile);
+        $configFile = $this->tempPath('satis.json');
 
         self::bootKernel()->getContainer();
 
         $serializer    = $this->createSerializer();
-        $filePersister = new FilePersister(new Filesystem(), $configFile->url(), $this->vfsRoot->url());
+        $filePersister = new FilePersister(new Filesystem(), $configFile, $this->tempPath('satis'));
         $persister     = new JsonPersister($filePersister, $serializer, Configuration::class);
 
         $configuration = new Configuration();
@@ -103,10 +96,10 @@ final class BuildCommandTest extends KernelTestCase
 
         $persister->flush($configuration);
 
-        $outputDir = new vfsStreamDirectory('output');
-        $this->vfsRoot->addChild($outputDir);
+        $outputDir = $this->tempPath('output');
+        (new Filesystem())->mkdir($outputDir);
 
-        $input       = $this->createInput($configFile->url(), $outputDir->url());
+        $input       = $this->createInput($configFile, $outputDir);
         $output      = $this->createOutput();
         $application = $this->createSatisApplication();
 
@@ -114,18 +107,16 @@ final class BuildCommandTest extends KernelTestCase
             $exitCode = $application->run($input, $output);
             self::assertSame(0, $exitCode, 'Expected exit code 0 for default form config build.');
         } catch (AssertionFailedError $error) {
-            echo $configFile->getContent();
+            echo (string) \file_get_contents($configFile);
             echo $output->fetch();
             throw $error;
         }
 
-        self::assertTrue($outputDir->hasChild('index.html'), 'index.html must be generated.');
-        self::assertTrue($outputDir->hasChild('packages.json'), 'packages.json must be generated.');
-        self::assertTrue($outputDir->hasChild('include'), 'include directory must exist.');
+        self::assertFileExists($outputDir . '/index.html', 'index.html must be generated.');
+        self::assertFileExists($outputDir . '/packages.json', 'packages.json must be generated.');
+        self::assertDirectoryExists($outputDir . '/include', 'include directory must exist.');
 
-        /** @var vfsStreamDirectory $includeDir */
-        $includeDir = $outputDir->getChild('include');
-        self::assertTrue($includeDir->hasChildren(), 'include directory must contain files.');
+        self::assertNotEmpty(\glob($outputDir . '/include/*') ?: [], 'include directory must contain files.');
     }
 
     private function createSatisApplication(): Application

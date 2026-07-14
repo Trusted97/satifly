@@ -17,7 +17,7 @@ Common quick commands:
 These variables are defined in the Makefile and can be overridden on the command line or in your environment.
 
 *   `APP_NAME` — application name (default: `satifly`)
-*   `APP_PORT` — HTTP port forwarded from the container (default: `8000`)
+*   `APP_PORT` — HTTP port forwarded from the container (default: `80`)
 *   `COMPOSE` — docker compose command (default: `docker compose`)
 *   `PHP_CONTAINER` — name of the PHP service/container in docker-compose (default: `php`)
 *   `ENV_FILE` — path to environment file checked by `make env-check` (default: `.env`)
@@ -80,7 +80,7 @@ Convenience targets to enable/disable Xdebug inside the PHP container at runtime
 ```
 # Build, start and install deps make start
 Open the app
-https://localhost:8000
+https://localhost
  (or the port set with APP_PORT)
 ```
 

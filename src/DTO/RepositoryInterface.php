@@ -2,40 +2,46 @@
 
 namespace App\DTO;
 
+/**
+ * Interface for repository data transfer objects.
+ *
+ * Defines the contract for repository properties and methods used
+ * in Satis or similar package repository configurations.
+ */
 interface RepositoryInterface
 {
     /**
-     * Get the repository name
+     * Get the repository name.
      */
     public function getName(): string;
 
     /**
-     * Set repository name.
+     * Set the repository name.
      */
     public function setName(string $name): self;
 
     /**
-     * Get unique identifier.
+     * Get a unique identifier for the repository.
      */
     public function getId(): string;
 
     /**
-     * Get the repository type
+     * Get the repository type (e.g., "vcs", "package").
      */
     public function getType(): string;
 
     /**
-     * Set repository type.
+     * Set the repository type.
      */
     public function setType(string $type): self;
 
     /**
-     * Get the repository host/url
+     * Get the repository URL or host.
      */
     public function getUrl(): string;
 
     /**
-     * Set repository host/url.
+     * Set the repository URL or host.
      */
     public function setUrl(string $url): self;
 }

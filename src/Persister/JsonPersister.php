@@ -7,6 +7,7 @@ use App\DTO\Archive;
 use App\DTO\Configuration;
 use App\DTO\PackageConstraint;
 use App\DTO\PackageStability;
+use App\DTO\RepositoryInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -14,14 +15,33 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * JSON-based persister for Satis configuration.
+ *
+ * Wraps a lower-level persister and handles serialization and deserialization
+ * of Configuration objects to/from JSON.
+ */
 class JsonPersister implements PersisterInterface
 {
     use SerializerAwareTrait;
 
+    /**
+     * @var PersisterInterface Persister that handles raw file I/O
+     */
     private PersisterInterface $persister;
 
+    /**
+     * Fully qualified class name of the Configuration DTO.
+     */
     private string $satisClass;
 
+    /**
+     * Constructor.
+     *
+     * @param PersisterInterface  $persister  Underlying file persister
+     * @param SerializerInterface $serializer Symfony serializer
+     * @param string              $satisClass Fully qualified DTO class name
+     */
     public function __construct(PersisterInterface $persister, SerializerInterface $serializer, string $satisClass)
     {
         $this->setSerializer($serializer);
@@ -29,9 +49,15 @@ class JsonPersister implements PersisterInterface
         $this->satisClass = $satisClass;
     }
 
+    /**
+     * Load and deserialize configuration from JSON.
+     *
+     * @throws \RuntimeException|ExceptionInterface If the JSON is empty
+     */
     public function load(): Configuration
     {
         $jsonString = $this->persister->load();
+
         if ('' === \mb_trim($jsonString)) {
             throw new \RuntimeException('Satis file is empty.');
         }
@@ -40,9 +66,13 @@ class JsonPersister implements PersisterInterface
     }
 
     /**
-     * @throws ExceptionInterface
+     * Serialize and persist the Configuration object to JSON.
+     *
+     * @param object|string $content Configuration object
+     *
+     * @throws ExceptionInterface On serialization error
      */
-    public function flush(object $content): void
+    public function flush(object|string $content): void
     {
         $jsonString = $this->serializer->serialize($content, 'json', [
             AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
@@ -60,16 +90,23 @@ class JsonPersister implements PersisterInterface
         $this->persister->flush($jsonString);
     }
 
-    public function normalizeRepositories($repositories): array
+    /**
+     * Normalize repositories into an array suitable for JSON serialization.
+     *
+     * @return array<string, RepositoryInterface>
+     */
+    public function normalizeRepositories(?\ArrayIterator $repositories): array
     {
         if ($repositories instanceof \ArrayIterator) {
-            return \iterator_to_array($repositories->getArrayCopy());
+            return $repositories->getArrayCopy();
         }
 
         return [];
     }
 
     /**
+     * Normalize array of PackageConstraint objects into associative array.
+     *
      * @param PackageConstraint[]|null $constraints
      *
      * @return string[]|null
@@ -79,6 +116,7 @@ class JsonPersister implements PersisterInterface
         if (empty($constraints)) {
             return null;
         }
+
         $require = [];
         foreach ($constraints as $constraint) {
             $require[$constraint->getPackage()] = $constraint->getConstraint();
@@ -88,6 +126,8 @@ class JsonPersister implements PersisterInterface
     }
 
     /**
+     * Normalize abandoned packages into associative array.
+     *
      * @param Abandoned[]|null $abandoned
      *
      * @return array<string, bool|string>|null
@@ -97,12 +137,10 @@ class JsonPersister implements PersisterInterface
         if (empty($abandoned)) {
             return null;
         }
+
         $list = [];
         foreach ($abandoned as $package) {
-            $replacement = $package->getReplacement();
-            if (empty($replacement)) {
-                $replacement = true;
-            }
+            $replacement                  = $package->getReplacement() ?: true;
             $list[$package->getPackage()] = $replacement;
         }
 
@@ -110,6 +148,8 @@ class JsonPersister implements PersisterInterface
     }
 
     /**
+     * Normalize package stability array into associative array.
+     *
      * @param PackageStability[] $list
      *
      * @return array<string, string>|null
@@ -128,6 +168,13 @@ class JsonPersister implements PersisterInterface
         return $data;
     }
 
+    /**
+     * Normalize Archive object into array for JSON serialization.
+     *
+     * @param Archive|null $archive
+     *
+     * @return array<string, mixed>
+     */
     public function normalizeArchive($archive): array
     {
         if ($archive instanceof Archive) {
@@ -149,6 +196,7 @@ class JsonPersister implements PersisterInterface
             'format'             => 'zip',
             'skip-dev'           => true,
             'whitelist'          => [],
+            'blacklist'          => [],
             'checksum'           => true,
             'ignore-filters'     => false,
             'override-dist-type' => false,

@@ -148,7 +148,7 @@ We label issues with:
 
 ## 🔒 Security
 
-If you discover a security vulnerability, **do not open a public issue**. Instead, please email contact the maintainers directly.
+If you discover a security vulnerability, **do not open a public issue**. Instead, please contact the maintainers directly by email.
 
 - - -
 

@@ -33,7 +33,7 @@ final class ApplicationKernelTest extends WebTestCase
             );
 
             self::assertPageTitleSame(
-                'Composer Repository currently not available',
+                'Composer repository unavailable',
                 'Unavailable page title did not match expectations.'
             );
         } finally {

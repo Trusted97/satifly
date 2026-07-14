@@ -6,5 +6,5 @@ interface PersisterInterface
 {
     public function load();
 
-    public function flush(object $content): void;
+    public function flush(object|string $content): void;
 }

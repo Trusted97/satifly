@@ -1,93 +1,116 @@
 {% extends "base.html.twig" %}
 
+{% block title %}Dashboard{% endblock %}
+
 {% block content %}
-    <main class="container">
-        <!-- Actions Row -->
-        <div class="row g-3 mb-4">
-            <!-- Repositories Actions -->
-            <div class="col-md-6">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3">📁 Repositories</h5>
-                        <div class="d-flex flex-column gap-2">
-                            <a href="{{ path('repository_new') }}" class="btn btn-outline-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
-                                </svg>
-                                Add a new repository
-                            </a>
-                            <a href="{{ path('repository_upload') }}" class="btn btn-outline-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
-                                </svg>
-                                Add all repositories from a composer.lock
-                            </a>
+    <section class="mb-4">
+        <div class="row g-3 align-items-stretch">
+            <div class="col-12 col-lg-7">
+                <div class="card h-100 border-0" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.98), rgba(14, 165, 233, 0.85)); color: #fff;">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="d-flex flex-column gap-3">
+                            <span class="badge rounded-pill text-bg-light text-primary align-self-start">Admin dashboard</span>
+                            <div>
+                                <h2 class="display-6 fw-semibold mb-3">Manage repositories without losing the flow.</h2>
+                                <p class="lead mb-0" style="max-width: 42rem;">
+                                    Add repositories, import from composer.lock, trigger builds, and keep your private Composer registry tidy from one place.
+                                </p>
+                            </div>
+                            <div class="d-flex flex-column flex-sm-row gap-2">
+                                <a href="{{ path('repository_new') }}" class="btn btn-light btn-lg">
+                                    Add repository
+                                </a>
+                                <a href="{{ path('repository_upload') }}" class="btn btn-outline-light btn-lg">
+                                    Import composer.lock
+                                </a>
+                                <a href="{{ path('satis_config') }}" class="btn btn-outline-light btn-lg">
+                                    Edit config
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- System Actions -->
-            <div class="col-md-6">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3">⚙️ System Actions</h5>
-                        <div class="d-flex flex-column gap-2">
-                            <a href="{{ path('satis_build') }}" class="btn btn-outline-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
-                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
-                                </svg>
-                                Build packages
-                            </a>
-
-                            <a href="{{ path('satis_config') }}" class="btn btn-outline-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
-                                </svg>
-                                Edit satis configuration
-                            </a>
+            <div class="col-12 col-lg-5">
+                <div class="row g-3 h-100">
+                    <div class="col-12">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="text-muted small text-uppercase fw-semibold mb-2">Repositories</div>
+                                <div class="display-5 fw-semibold mb-1">{{ repositories|length }}</div>
+                                <div class="text-muted">Tracked sources in your registry.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card h-100">
+                            <div class="card-body d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between">
+                                <div>
+                                    <div class="text-muted small text-uppercase fw-semibold mb-2">Next step</div>
+                                    <h3 class="h5 mb-1">Keep your registry up to date</h3>
+                                    <p class="mb-0 text-muted">Review the list below, then open the relevant repository to edit or remove it.</p>
+                                </div>
+                                <a href="{{ path('satis_build') }}" class="btn btn-primary">
+                                    Build packages
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Registered Repositories Table -->
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">📦 Total registered repositories: {{ repositories|length }}</h5>
+    <section>
+        <div class="card">
+            <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 py-3">
+                <div>
+                    <h3 class="h5 mb-1">Registered repositories</h3>
+                    <p class="text-muted mb-0">Open a repository to review or edit its configuration.</p>
                 </div>
+                <span class="badge rounded-pill text-bg-primary px-3 py-2">{{ repositories|length }} total</span>
+            </div>
 
+            {% if repositories is empty %}
+                <div class="card-body py-5">
+                    <div class="text-center mx-auto" style="max-width: 34rem;">
+                        <h4 class="h3 mb-3">No repositories yet</h4>
+                        <p class="text-muted mb-4">
+                            Start by adding a repository manually or import one from a composer.lock file. Once added, it will appear here for quick editing and build management.
+                        </p>
+                        <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                            <a href="{{ path('repository_new') }}" class="btn btn-primary btn-lg">Add repository</a>
+                            <a href="{{ path('repository_upload') }}" class="btn btn-outline-primary btn-lg">Import composer.lock</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
                 <div class="table-responsive">
-                    <table class="table align-middle">
-                        <thead class="table-light">
+                    <table class="table table-hover align-middle">
+                        <thead>
                         <tr>
-                            <th scope="col" style="width: 50px;">#</th>
+                            <th scope="col" style="width: 72px;">#</th>
                             <th scope="col">Repository URL</th>
                             <th scope="col">Repository Name</th>
-                            <th scope="col" class="text-end" style="width: 80px;">Detail</th>
+                            <th scope="col" class="text-end" style="width: 160px;">Action</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for repository in repositories %}
                             <tr>
-                                <td>{{ loop.index }}</td>
-                                <td>
-                                    <a href="{{ repository.url }}" target="_blank" class="link-primary text-decoration-none">
+                                <td class="text-muted fw-semibold">{{ loop.index }}</td>
+                                <td class="text-break">
+                                    <a href="{{ repository.url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
                                         {{ repository.url }}
                                     </a>
                                 </td>
-                                <td>
-                                    {{ repository.name }}
+                                <td class="fw-medium">
+                                    {{ repository.name ?: 'Unnamed repository' }}
                                 </td>
                                 <td class="text-end">
                                     <a href="{{ path('repository_edit', {'repository': repository.id }) }}" class="btn btn-sm btn-outline-primary">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                                        </svg>
-                                        View
+                                        View details
                                     </a>
                                 </td>
                             </tr>
@@ -95,9 +118,7 @@
                         </tbody>
                     </table>
                 </div>
-
-            </div>
+            {% endif %}
         </div>
-    </main>
-
+    </section>
 {% endblock %}

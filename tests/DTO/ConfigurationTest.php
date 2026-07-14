@@ -63,7 +63,9 @@ final class ConfigurationTest extends TestCase
         $repo = [$this->createMock(\App\DTO\RepositoryInterface::class)];
         $config->setRepositories($repo);
         $this->assertInstanceOf(\ArrayIterator::class, $config->getRepositories());
-        $this->assertSame($repo, \iterator_to_array($config->getRepositories()));
+        $repositories = \iterator_to_array($config->getRepositories());
+        $this->assertCount(1, $repositories);
+        $this->assertSame($repo[0], \reset($repositories));
 
         $packageConstraint = [new PackageConstraint('foo', '^1.0')];
         $config->setRequire($packageConstraint);

@@ -13,20 +13,39 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * Normalizer and denormalizer for Satis configuration DTOs.
+ *
+ * Handles conversion between arrays and DTO objects for:
+ * - PackageConstraint
+ * - Repository
+ * - PackageStability
+ * - Abandoned
+ * - Archive
+ */
 class ConfigurationNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     private SerializerInterface $serializer;
 
+    /**
+     * Normalize data to array or scalar.
+     */
     public function normalize($data, ?string $format = null, array $context = []): float|array|\ArrayObject|bool|int|string|null
     {
         return $data;
     }
 
+    /**
+     * Check if normalization is supported.
+     */
     public function supportsNormalization($data, ?string $format = null, array $context = []): false
     {
         return false;
     }
 
+    /**
+     * Denormalize data into DTO objects.
+     */
     public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         if ($type === PackageConstraint::class . '[]') {
@@ -56,30 +75,35 @@ class ConfigurationNormalizer implements NormalizerInterface, DenormalizerInterf
         return $data;
     }
 
+    /**
+     * Check if denormalization is supported.
+     */
     public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
-        switch ($type) {
-            case PackageConstraint::class . '[]':
-            case RepositoryInterface::class . '[]':
-            case PackageStability::class . '[]':
-            case Abandoned::class . '[]':
-            case Archive::class:
-                return true;
-            default:
-        }
-
-        return false;
+        return match ($type) {
+            PackageConstraint::class . '[]',
+            RepositoryInterface::class . '[]',
+            PackageStability::class . '[]',
+            Abandoned::class . '[]',
+            Archive::class => true,
+            default        => false,
+        };
     }
 
+    /**
+     * Inject serializer for nested denormalization.
+     */
     public function setSerializer(SerializerInterface $serializer): void
     {
         $this->serializer = $serializer;
     }
 
     /**
+     * Denormalize require section into PackageConstraint objects.
+     *
      * @return PackageConstraint[]
      */
-    private function denormalizeRequire($data): array
+    private function denormalizeRequire(array $data): array
     {
         $require = [];
         foreach ($data as $package => $constraint) {
@@ -89,7 +113,12 @@ class ConfigurationNormalizer implements NormalizerInterface, DenormalizerInterf
         return $require;
     }
 
-    private function denormalizeRepositories($data): \ArrayIterator
+    /**
+     * Denormalize repositories array into Repository objects.
+     *
+     * @return \ArrayIterator<int, RepositoryInterface>
+     */
+    private function denormalizeRepositories(array $data): \ArrayIterator
     {
         $list = [];
         foreach ($data as $item) {
@@ -103,7 +132,12 @@ class ConfigurationNormalizer implements NormalizerInterface, DenormalizerInterf
         return new \ArrayIterator($list);
     }
 
-    private function denormalizePackageStability($data): array
+    /**
+     * Denormalize package stability array into PackageStability objects.
+     *
+     * @return PackageStability[]
+     */
+    private function denormalizePackageStability(array $data): array
     {
         $list = [];
         foreach ($data as $package => $stability) {
@@ -113,7 +147,12 @@ class ConfigurationNormalizer implements NormalizerInterface, DenormalizerInterf
         return $list;
     }
 
-    private function denormalizeAbandoned($data): array
+    /**
+     * Denormalize abandoned packages array into Abandoned objects.
+     *
+     * @return Abandoned[]
+     */
+    private function denormalizeAbandoned(array $data): array
     {
         $list = [];
         foreach ($data as $package => $replacement) {
@@ -126,10 +165,12 @@ class ConfigurationNormalizer implements NormalizerInterface, DenormalizerInterf
         return $list;
     }
 
-    private function denormalizeArchive($data): Archive
+    /**
+     * Denormalize archive array into Archive object.
+     */
+    private function denormalizeArchive(array $data): Archive
     {
         $archive = new Archive();
-
         $archive->setDirectory($data['directory'] ?? null);
         $archive->setFormat($data['format'] ?? null);
         $archive->setSkipDev((bool) ($data['skip-dev'] ?? false));
@@ -145,6 +186,11 @@ class ConfigurationNormalizer implements NormalizerInterface, DenormalizerInterf
         return $archive;
     }
 
+    /**
+     * List of supported types for denormalization.
+     *
+     * @return array<string, bool>
+     */
     public function getSupportedTypes(?string $format): array
     {
         return [

@@ -8,35 +8,74 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
  * Archive Configuration class
  *
  * Represents the "archive" section in a Satis configuration file.
+ * This class holds all settings related to archiving packages, such as
+ * the target directory, format, filters, and behavior flags.
  */
 class Archive
 {
+    /**
+     * Directory where the archive files are stored
+     */
     private string $directory = '';
 
+    /**
+     * Archive format (e.g., zip, tar)
+     */
     private string $format = '';
 
+    /**
+     * Absolute directory path (if different from relative directory)
+     */
     #[SerializedName('absolute-directory')]
     private ?string $absoluteDirectory = null;
 
+    /**
+     * Whether to skip dev packages when archiving
+     */
     #[SerializedName('skip-dev')]
     private bool $skipDev = true;
 
+    /**
+     * List of packages to explicitly include
+     */
     private array $whitelist = [];
 
+    /**
+     * List of packages to explicitly exclude
+     */
     private array $blacklist = [];
 
+    /**
+     * Optional URL prefix for the archive
+     */
     #[SerializedName('prefix-url')]
     private ?string $prefixUrl = null;
 
+    /**
+     * Whether to generate checksums for the archive
+     */
     private bool $checksum = true;
 
+    /**
+     * Whether to ignore filters when archiving
+     */
     #[SerializedName('ignore-filters')]
     private bool $ignoreFilters = false;
 
+    /**
+     * Whether to override distribution type for packages
+     */
     #[SerializedName('override-dist-type')]
     private bool $overrideDistType = false;
 
+    /**
+     * Whether to rearchive existing packages
+     */
     private bool $rearchive = true;
+
+    // -----------------------
+    // Getter and Setter Methods
+    // -----------------------
 
     public function getDirectory(): string
     {

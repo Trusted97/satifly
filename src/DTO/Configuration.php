@@ -5,31 +5,52 @@ namespace App\DTO;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Webmozart\Assert\Assert;
 
+/**
+ * Main configuration class for Satis repository setup.
+ *
+ * Represents the overall configuration of a repository including:
+ *  - Repository metadata (name, description, homepage)
+ *  - Output settings (directory, HTML output)
+ *  - Package requirements and stability rules
+ *  - Archive options
+ *  - Providers, abandoned packages, and blacklists
+ *
+ * This class is used for both reading and writing Satis configuration.
+ */
 class Configuration
 {
+    /**
+     * Default output directory for Satis-generated files.
+     */
     public const string DEFAULT_OUTPUT_DIR = 'public';
 
-    public string $name        = 'localhost/repository';
-    public string $description = '';
-    public string $homepage    = 'http://localhost';
+    /** @var string Repository name */
+    public string $name = 'localhost/repository';
 
+    /** @var string Repository description */
+    public string $description = '';
+
+    /** @var string Repository homepage URL */
+    public string $homepage = 'http://localhost';
+
+    /** @var string Output directory for Satis files */
     #[SerializedName('output-dir')]
     public string $outputDir = self::DEFAULT_OUTPUT_DIR;
 
+    /** @var bool Whether to generate HTML output */
     #[SerializedName('output-html')]
     public bool $outputHtml = true;
 
     /**
-     * @var \ArrayObject<string, RepositoryInterface>|RepositoryInterface[]
+     * @var \ArrayIterator<int, RepositoryInterface> List of repositories
      */
-    public \ArrayIterator|array $repositories;
+    private \ArrayIterator $repositories;
 
-    /**
-     * @var PackageConstraint[]
-     */
+    /** @var PackageConstraint[] List of required packages */
     #[SerializedName('require')]
     public array $require = [];
 
+    /** @var bool Whether to require all packages */
     #[SerializedName('require-all')]
     public bool $requireAll = false;
 
@@ -42,64 +63,70 @@ class Configuration
     #[SerializedName('require-dependency-filter')]
     public bool $requireDependencyFilter = true;
 
-    /**
-     * @var string[]|null
-     */
+    /** @var string[]|null Hosts to strip from package URLs */
     #[SerializedName('strip-hosts')]
     private ?array $stripHosts = null;
 
+    /** @var string|null Optional included configuration filename */
     #[SerializedName('include-filename')]
     public ?string $includeFilename = null;
 
+    /** @var Archive|null Archive configuration */
     #[SerializedName('archive')]
     public ?Archive $archive = null;
 
+    /** @var string|null Minimum stability level for packages */
     #[SerializedName('minimum-stability')]
     public ?string $minimumStability = 'dev';
 
-    /**
-     * @var PackageStability[]
-     */
+    /** @var PackageStability[] Minimum stability per package */
     #[SerializedName('minimum-stability-per-package')]
     public array $minimumStabilityPerPackage = [];
 
+    /** @var bool Whether to generate providers */
     public bool $providers = false;
 
+    /** @var int|null Size of provider history */
     #[SerializedName('providers-history-size')]
     private ?int $providersHistorySize = null;
 
+    /** @var string|null Twig template name */
     #[SerializedName('twig-template')]
     public ?string $twigTemplate = null;
 
-    /**
-     * @var Abandoned[]
-     */
+    /** @var Abandoned[] List of abandoned packages */
     public array $abandoned = [];
 
-    /**
-     * @var PackageConstraint[]
-     */
+    /** @var PackageConstraint[] List of blacklisted packages */
     public array $blacklist = [];
 
-    /**
-     * @var mixed[]|null
-     */
+    /** @var array|null Raw configuration array */
     public ?array $config = null;
 
+    /** @var string|null Batch notification email */
     #[SerializedName('notify-batch')]
     public ?string $notifyBatch = null;
 
+    /** @var string|null Optional comment in configuration */
     #[SerializedName('_comment')]
     private ?string $comment = null;
 
+    /** @var bool Whether to pretty-print JSON output */
     #[SerializedName('pretty-print')]
     public bool $prettyPrint = true;
 
+    /**
+     * Constructor initializes default values for repositories and archive.
+     */
     public function __construct()
     {
         $this->repositories = new \ArrayIterator();
         $this->archive      = new Archive();
     }
+
+    // -------------------
+    // Getter and Setter Methods
+    // -------------------
 
     public function getName(): string
     {
@@ -204,10 +231,32 @@ class Configuration
      */
     public function setRepositories(array|\ArrayIterator $repositories): self
     {
-        if (\is_array($repositories)) {
-            $repositories = new \ArrayIterator($repositories);
+        $list = [];
+
+        foreach ($repositories as $key => $repository) {
+            if ($repository instanceof RepositoryInterface) {
+                $list[$repository->getId()] = $repository;
+                continue;
+            }
+
+            if (!\is_array($repository)) {
+                continue;
+            }
+
+            $item = new Repository(
+                url: (string) ($repository['url'] ?? ''),
+                type: (string) ($repository['type'] ?? 'vcs'),
+                name: (string) ($repository['name'] ?? '')
+            );
+
+            if (!empty($repository['installation-source'])) {
+                $item->setInstallationSource((string) $repository['installation-source']);
+            }
+
+            $list[\is_string($key) ? $key : $item->getId()] = $item;
         }
-        $this->repositories = $repositories;
+
+        $this->repositories = new \ArrayIterator($list);
 
         return $this;
     }

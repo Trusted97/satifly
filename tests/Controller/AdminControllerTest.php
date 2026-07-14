@@ -2,25 +2,25 @@
 
 namespace App\Tests\Controller;
 
-use App\Tests\Traits\VfsTrait;
-use org\bovigo\vfs\vfsStreamFile;
+use App\Tests\Traits\TempFilesystemTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class AdminControllerTest extends WebTestCase
 {
-    use VfsTrait;
+    use TempFilesystemTrait;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->vfsSetup();
+        $this->tempSetup('satifly-admin');
+        $this->configureSatisTestEnv();
     }
 
     protected function tearDown(): void
     {
-        $this->vfsTearDown();
+        $this->tempTearDown();
         parent::tearDown();
     }
 
@@ -96,11 +96,9 @@ final class AdminControllerTest extends WebTestCase
      */
     private function assertRepositoryInConfig(string $url, string $type, string $installationSource): void
     {
-        self::assertTrue($this->vfsRoot->hasChild('satis.json'), 'satis.json must exist in vfsRoot.');
+        self::assertFileExists($this->tempPath('satis.json'), 'satis.json must exist on disk.');
 
-        /** @var vfsStreamFile $configFile */
-        $configFile = $this->vfsRoot->getChild('satis.json');
-        $config     = \json_decode($configFile->getContent(), false, 512, \JSON_THROW_ON_ERROR);
+        $config = \json_decode((string) \file_get_contents($this->tempPath('satis.json')), false, 512, \JSON_THROW_ON_ERROR);
 
         self::assertObjectHasProperty('repositories', $config, 'satis.json must contain "repositories".');
 
@@ -113,4 +111,5 @@ final class AdminControllerTest extends WebTestCase
         self::assertSame($type, $firstRepo->type, 'Repository type must match.');
         self::assertSame($installationSource, $firstRepo->{'installation-source'}, 'Installation source must match.');
     }
+
 }

@@ -68,13 +68,13 @@ make satis-init
 
 ### Option 3: Configure via Web UI
 
-Open `/admin/configuration` and fill in repository, package, and archive settings directly in your browser.
+Open `/admin/satis/config` and fill in repository, package, and archive settings directly in your browser.
 
 - - -
 
 ## 🔐 Authentication (Optional)
 
-To enable basic authentication, edit `app/config/parameters.yml` and set:
+To enable basic authentication, edit `config/parameters.yml` and set:
 
 ```
 admin:

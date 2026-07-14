@@ -3,13 +3,15 @@
   "description": "Test repository",
   "homepage": "http:\/\/test.com",
   "output-dir": ".\/web",
-  "repositories": [
-    {
-      "type": "git",
-      "url": "git@github.com:ludofleury\/satisfy.git",
-      "name": "ludofleury\/satisfy.git"
-    }
-  ],
+    "repositories": {
+        "c0915e5562865e4a7fb99382fc201b5c": {
+            "id": "c0915e5562865e4a7fb99382fc201b5c",
+            "type": "vcs",
+            "url": "https:\/\/github.com\/Trusted97\/whitecat.git",
+            "installation-source": "dist",
+            "name": "trusted97\/whitecat"
+        }
+    },
   "require": {
     "ludofleury\/satisfy":"*"
   },
