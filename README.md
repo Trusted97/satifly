@@ -9,6 +9,20 @@
 
 - - -
 
+## Documentation
+
+Start with the [docs hub](docs/README.md).
+
+- [Architecture overview](docs/architecture/overview.md)
+- [Developer guide](docs/development/guide.md)
+- [Docker guide](docs/docker/overview.md)
+- [Testing guide](docs/testing/guide.md)
+- [Security guide](docs/security/overview.md)
+- [Troubleshooting guide](docs/troubleshooting/guide.md)
+- [Webhook guide](docs/webhook.md)
+
+- - -
+
 ## 💡 Why Satifly?
 
 Managing private Composer packages doesn’t have to be painful. Satifly eliminates manual configuration, provides a beautiful web UI, and automates your build and deployment process - securely and efficiently.
@@ -18,7 +32,7 @@ Managing private Composer packages doesn’t have to be painful. Satifly elimina
 *   ⚡ **FrankenPHP-powered performance** - fast, concurrent builds out of the box
 *   🐳 **Zero-effort Docker stack** - ready to run in seconds
 *   🔄 **[VCS webhooks](docs/webhook.md)** - automatic package rebuilds on push
-*   🚀 **HTTP/3 + Early Hints** — next-gen web delivery built-in
+*   🚀 **HTTP/3 + Early Hints** - next-gen web delivery built-in
 
 Satifly builds upon the excellent work of [project-satisfy/satisfy](https://github.com/project-satisfy/satisfy), extending it with cutting-edge tooling and developer-first improvements.
 
@@ -49,7 +63,7 @@ make doctor
 make down
 ```
 
-👉 Want advanced Docker, Composer, or Xdebug workflows? Refer to the [Makefile documentation](docs/makefile.md) for advanced commands.
+👉 Want advanced Docker, Composer, or Xdebug workflows? Refer to the [developer guide](docs/development/guide.md) and [Makefile reference](docs/makefile.md).
 
 - - -
 
@@ -79,18 +93,6 @@ admin:
   users:
     - { username: admin, password: secret }
 ```
-
-### 💻 Manual Setup (Optional)
-
-Not a Docker fan? Install manually with Composer:
-
-```
-git clone https://github.com/Trusted97/satifly
-wget http://getcomposer.org/composer.phar
-php composer.phar install -n
-```
-
-- - -
 
 ## 🧱 Running Satifly
 
@@ -123,6 +125,6 @@ Satifly is open source and distributed under the **MIT License**. For details, s
 
 ## 🤝 Contribute
 
-We welcome contributions from developers and organizations! Whether it’s improving documentation, adding integrations, or refining the UI, your input helps Satifly grow.
+We welcome contributions from developers and organizations.
 
-Fork the project on [GitHub](https://github.com/Trusted97/satifly), open a pull request, and join the mission to simplify PHP package management.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.

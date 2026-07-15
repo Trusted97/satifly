@@ -1,7 +1,6 @@
-# Satifly — Makefile Documentation
+# Makefile Reference
 
-This document describes the `Makefile` provided for the **Satifly** project. It explains variables, available targets, examples, and Xdebug toggles. 
-The file aims to simplify common Docker, Composer, and Symfony workflows.
+This page documents the main `Makefile` targets for Satifly.
 
 ## Quick start
 
@@ -50,7 +49,7 @@ The Makefile exposes the following main targets. Use `make help` inside the repo
 *   `install` — Run `composer install -n --prefer-dist` inside the PHP container.
 *   `update` — Run `composer update` inside the PHP container.
 *   `shell` — Open an interactive bash shell in the PHP container: `docker compose exec <php> bash`.
-*   `test` — Run PHPUnit tests: `php bin/phpunit` inside container.
+*   `test` — Run PHPUnit tests via `composer test` inside container.
 *   `satis-init` — Run the interactive `vendor/bin/satis init` command.
 *   `satis-build` — Run `vendor/bin/satis build` to generate package definitions.
 
@@ -75,34 +74,39 @@ Convenience targets to enable/disable Xdebug inside the PHP container at runtime
 
 ## Examples & common workflows
 
-### Start developing (first time)
+### Start Developing
 
+```bash
+make start
 ```
-# Build, start and install deps make start
-Open the app
-https://localhost
- (or the port set with APP_PORT)
-```
+
+Use `APP_PORT` only if you override container port mapping.
+
+Open the app at `https://localhost`.
 
 ### Enable Xdebug for a debug session
 
+```bash
+make xdebug-on
 ```
-# Turn Xdebug on make xdebug-on
-Attach your debugger (IDE) to the forwarded port / container
+
+Attach debugger to forwarded port / container.
+
 When finished, turn it off:
 
+```bash
 make xdebug-off
 ```
 
 ### Rebuild everything
 
-```
-# Full clean + rebuild make rebuild
+```bash
+make rebuild
 ```
 
 ## Troubleshooting
 
-*   **Composer hanging or failing:** ensure `auth.json` is present if you access private repos. Use `make shell` and run composer manually inside the container to inspect errors.
+*   **Composer hanging or failing:** ensure credentials are available if you access private repos. Use `make shell` and run composer manually inside container to inspect errors.
 *   **Missing .env:** run `make env-check` or copy `.env.dist` to `.env`.
 *   **Xdebug not connecting:** check `xdebug.client_host` (you may need to set it to `host.docker.internal` or your host IP). See the _Notes on Xdebug host configuration_ below.
 

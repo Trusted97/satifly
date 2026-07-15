@@ -1,159 +1,81 @@
-# 🧩 Contributing to Satifly
+# Contributing to Satifly
 
-Thanks for your interest in contributing to **Satifly** — the modern web interface and Dockerized runtime for [Composer Satis](https://getcomposer.org/doc/articles/handling-private-packages-with-satis.md). We’re thrilled to have you join the community!
+Thanks for helping improve Satifly.
 
-- - -
+## Before You Start
 
-## 🧱 Project Overview
+Read:
 
-Satifly provides a simple web UI and API for managing private PHP packages with **Satis**, powered by **Symfony**, **Caddy**, and **FrankenPHP**.
+- [Documentation hub](docs/README.md)
+- [Architecture overview](docs/architecture/overview.md)
+- [Developer guide](docs/development/guide.md)
+- [Testing guide](docs/testing/guide.md)
 
-This project aims to simplify hosting and managing Composer repositories while remaining **lightweight, configurable, and production-ready**.
+## Branch Naming
 
-- - -
+- Use `codex/...` for local agent work
+- Use short, task-focused names
+- Example: `codex/docs-refresh`
 
-## 🚀 Getting Started (Development Setup)
+## Commit Style
 
-### 1\. Clone the repository
+Use conventional commits.
 
-```
-git clone https://github.com/Trusted97/satifly.git
-cd satifly
-```
+Examples:
 
-### 2\. Build the Docker environment
-
-```
-make build
-```
-
-### 3\. Start the development stack
-
-```
-make up
+```text
+docs: refresh architecture guide
+fix: handle empty webhook payload
+refactor: simplify repository manager
+test: replace vfs stream with temp files
 ```
 
-This will start Satifly with:
+## Code Style
 
-*   PHP (FrankenPHP worker mode)
-*   Caddy web server (HTTP/3 + HTTPS)
-*   Symfony web UI accessible at [https://localhost](https://localhost)
+- PHP: PSR-12 plus project fixer config
+- Twig: keep templates small, reusable, and readable
+- Comments: explain why, not obvious what
 
-- - -
+Run before PR:
 
-## 🧩 Development Guidelines
-
-### Code Style
-
-We follow:
-
-*   **PSR-12** for PHP code
-*   **Symfony Coding Standards** for structure and naming
-*   **Twig best practices** for templates
-
-Before submitting a pull request, ensure code style consistency:
-
-```
+```bash
 make style
-```
-
-- - -
-
-### Commit Messages
-
-Use **conventional commits** for clarity:
-
-```
-feat: add webhook configuration to UI
-fix: resolve null homepage issue in SatisConfigType
-docs: improve README installation section
-refactor: move config transformer to dedicated service
-```
-
-- - -
-
-### Pull Request Process
-
-1.  Fork the repository and create your branch
-2.  Ensure all tests and checks pass locally:
-
-    ```
-    make test
-    ```
-
-3.  Update documentation if you changed features or behaviors
-4.  Open a PR with a clear title and description
-
-CI (GitHub Actions) will run:
-
-*   PHPUnit tests
-*   Linting and syntax validation
-
-Your PR will be reviewed and merged once all checks pass ✅
-
-- - -
-
-## 🧪 Testing
-
-Satifly uses **PHPUnit** for backend testing and **Panther** for browser tests.
-
-Run the test suite:
-
-```
 make test
 ```
 
-- - -
+## Pull Requests
 
-## 🐳 Docker Tips
+1. Keep changes small.
+2. Update docs when behavior changes.
+3. Include tests for behavior changes.
+4. Describe user impact clearly.
 
-Rebuild containers after dependency updates:
+## Review Expectations
 
-```
-make rebuild
-```
+- Passing tests
+- Clear diff
+- No stale docs
+- No accidental behavior changes
 
-Clean up unused images and volumes:
+## Issue Reports
 
-```
-make clean
-```
+Include:
 
-Restart the stack:
+- what you expected
+- what happened
+- repro steps
+- environment details
+- logs or screenshots when useful
 
-```
-make down && make up
-```
+## Release Workflow
 
-- - -
+Current flow is simple and manual:
 
-## 💬 Submitting Issues
+1. Merge reviewed changes.
+2. Run full test suite.
+3. Verify docs and changelog notes.
+4. Tag release if needed.
 
-If you find a bug or have a feature request, please open an issue with:
+## Security Reports
 
-*   A **clear description** of the problem or idea
-*   Steps to reproduce (if applicable)
-*   Your environment (PHP version, Docker version, OS)
-*   Logs or screenshots when relevant
-
-We label issues with:
-
-*   `bug`
-*   `feature`
-*   `enhancement`
-*   `docs`
-*   `good first issue`
-
-- - -
-
-## 🔒 Security
-
-If you discover a security vulnerability, **do not open a public issue**. Instead, please contact the maintainers directly by email.
-
-- - -
-
-## ❤️ Thank You
-
-Your contributions — big or small — help make **Satifly** faster, safer, and more flexible for the PHP community. We truly appreciate your time, ideas, and code!
-
-_Happy coding! 🎉_
+Do not open public issue for security bug. Contact maintainers directly.
